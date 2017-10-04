@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"math/rand"
 	"os"
 	"path/filepath"
 	"strings"
@@ -44,16 +45,15 @@ func main() {
 
 	csvPath, err := filepath.Abs(flagFilePath)
 	if err != nil {
-		log.Fatalln("Unable to parse path")
+		log.Fatalln("Unable to parse path" + csvPath)
 	}
 	file, err := os.Open(csvPath)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalln(err)
 	}
 	defer file.Close()
 
 	csvReader := csv.NewReader(file)
-	csvReader.Comma = '\t'
 	csvData, err := csvReader.ReadAll()
 	if err != nil {
 		log.Fatalln(err)
@@ -65,9 +65,8 @@ func main() {
 	responses := make(map[int]string, totalQuestions)
 
 	for i, data := range csvData {
-		parts := strings.Split(data[0], ",")
-		questions[i] = parts[0]
-		answers[i] = parts[1]
+		questions[i] = data[0]
+		answers[i] = data[1]
 	}
 
 	respondTo := make(chan string)
@@ -75,20 +74,27 @@ func main() {
 	// block until user presses enter
 	fmt.Println("Press [Enter] to start test.")
 	bufio.NewScanner(os.Stdout).Scan()
+	if flagRandom {
+		// seed the random number generator with the current time
+		rand.Seed(time.Now().UTC().UnixNano())
+	}
+	// randPool should contain random indexes into the questions map
+	randPool := rand.Perm(totalQuestions)
 
-	timeUp := time.After(time.Second * time.Duration(flagTime))
 	wg.Add(1)
+	timeUp := time.After(time.Second * time.Duration(flagTime))
 	go func() {
 	label:
-		for i, question := range questions {
-			go askQuestion(os.Stdout, os.Stdin, question, respondTo)
+		for i := 0; i < totalQuestions; i++ {
+			index := randPool[i]
+			go askQuestion(os.Stdout, os.Stdin, questions[index], respondTo)
 			select {
 			case <-timeUp:
 				fmt.Fprintln(os.Stderr, "\nTime up!")
 				break label
 			case ans, ok := <-respondTo:
 				if ok {
-					responses[i] = ans
+					responses[index] = ans
 				} else {
 					break label
 				}
