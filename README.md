@@ -1,9 +1,21 @@
 # Exercise #1: Quiz Game
 
+This exercise is broken into two parts.
+
+#### Part 1
+
 [![topic: csvs](https://img.shields.io/badge/topic-csvs-green.svg?style=flat-square)](https://github.com/search?q=topic%3Acsvs+org%3Agophercises&type=Repositories)
+[![topic: flags](https://img.shields.io/badge/topic-flags-green.svg?style=flat-square)](https://github.com/search?q=topic%3Aflags+org%3Agophercises&type=Repositories)
+[![topic: opening files](https://img.shields.io/badge/topic-opening%2Dfiles-green.svg?style=flat-square)](https://github.com/search?q=topic%3Aos%2Dpackage+org%3Agophercises&type=Repositories)
+[![topic: strings](https://img.shields.io/badge/topic-strings-green.svg?style=flat-square)](https://github.com/search?q=topic%3Astrings+org%3Agophercises&type=Repositories)
+
+#### Part 2
+
 [![topic: goroutines](https://img.shields.io/badge/topic-goroutines-green.svg?style=flat-square)](https://github.com/search?q=topic%3Agoroutines+org%3Agophercises&type=Repositories)
 [![topic: channels](https://img.shields.io/badge/topic-channels-green.svg?style=flat-square)](https://github.com/search?q=topic%3Achannels+org%3Agophercises&type=Repositories)
-[![topic: flags](https://img.shields.io/badge/topic-flags-green.svg?style=flat-square)](https://github.com/search?q=topic%3Aflags+org%3Agophercises&type=Repositories)
+[![topic: timers](https://img.shields.io/badge/topic-timers-green.svg?style=flat-square)](https://github.com/search?q=topic%3Atime$2Dpackages+org%3Agophercises&type=Repositories)
+
+
 
 ![video status: unreleased](https://img.shields.io/badge/video%20status-unreleased-red.svg?style=flat-square)
 ![code status: unreleased](https://img.shields.io/badge/code%20status-unreleased-red.svg?style=flat-square)
