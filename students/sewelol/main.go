@@ -12,11 +12,14 @@ import (
 	"time"
 )
 
+// Problem structure
 type Problem struct {
 	q string
 	a int
 }
 
+// readProblems takes reads problems from file, line by line
+// problems are written to problems channel
 func readProblems(problems chan Problem, fd *os.File) {
 	// Scan file
 	scanner := bufio.NewScanner(fd)
@@ -33,6 +36,7 @@ func readProblems(problems chan Problem, fd *os.File) {
 		// add problem to queue
 		problems <- Problem{q, ans}
 	}
+	// end condition
 	problems <- Problem{"", 0}
 }
 
