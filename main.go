@@ -36,20 +36,26 @@ func readProblems(problems chan Problem, fd *os.File) {
 	problems <- Problem{"", 0}
 }
 
+// solveProblem consumes problems from chan
+// will check timer before giving points
 func solveProblem(problems chan Problem, timer chan bool) (score int) {
 	// Score
 	score = 0
 	// IO reader
 	scanner := bufio.NewScanner(os.Stdin)
 
+	// start consuming problems from channel
 	for p := range problems {
-		// all problems received
+
+		// check if all problems received (hacky)
 		if p.q == "" {
-			log.Println("done receiving problems")
+			log.Println("no more problems on channel")
 			break
 		}
-		// Print question
+
+		// Print problem question
 		fmt.Printf("%s = ", p.q)
+
 		// Scan IO
 		scanner.Scan()
 		// convert string answer to integer
@@ -58,20 +64,22 @@ func solveProblem(problems chan Problem, timer chan bool) (score int) {
 			log.Fatal()
 		}
 
-		// Check if time out
+		// Check if time-out
 		select {
-		case <-timer:
+
+		case <-timer: // if time-out received, return current score
 			log.Println("time out")
 			return score
-		default:
-			break
+
+		default: // else, do nothing
 		}
 
-		// Check answer
+		// Check answer and give points
 		if givenAns == p.a {
 			score++
 			fmt.Println("Correct!")
 		} else {
+			score--
 			fmt.Println("Wrong!")
 		}
 	}
@@ -79,23 +87,30 @@ func solveProblem(problems chan Problem, timer chan bool) (score int) {
 	return score
 }
 
+// startTimer pings timer channel after n seconds
 func startTimer(seconds int, timer chan bool) {
+	// sleep for n seconds
 	time.Sleep(time.Duration(seconds) * time.Second)
-
+	// write time-out to channel
 	timer <- true
 }
 
 func main() {
-	log.SetOutput(ioutil.Discard)
-	// Command line flags
+	// Parse Command line flags
 	filenamePtr := flag.String("f", "problems.csv", "name of problem csv file")
-	secondsPtr := flag.Int("d", 10, "number of seconds to solve problems")
+	secondsPtr := flag.Int("t", 10, "number of seconds to solve problems")
+	debugPtr := flag.Bool("debug", false, "show debug information")
 	flag.Parse()
 
+	// Show debug/logging information
+	if !*debugPtr {
+		log.SetOutput(ioutil.Discard)
+	}
+	log.Println("debug:", *debugPtr)
 	log.Println("filename:", *filenamePtr)
-	log.Println("delay:", *secondsPtr)
+	log.Println("timer:", *secondsPtr)
 
-	// Open file
+	// Open problems file
 	fd, err := os.Open(*filenamePtr)
 	if err != nil {
 		log.Fatal(err)
@@ -116,5 +131,6 @@ func main() {
 	// solve problems
 	score := solveProblem(problems, timer)
 
+	// Show final score
 	fmt.Printf("Your score is %d\n", score)
 }
