@@ -29,9 +29,8 @@ const DEFAULTTIMELIMIT = 30 //seconds
 var count int
 
 // Score counter
-var score int = 0
-
-var faults int = 0
+var score int
+var faults int
 
 // readProblems takes reads problems from file, line by line
 // problems are written to problems channel
@@ -74,7 +73,7 @@ func readProblems(problems chan Problem, filename string, shuffle bool) {
 	}
 
 	// send problems over channel
-	for _, p := range buf {
+	for _, p := range buf[:count] {
 		problems <- p
 	}
 
