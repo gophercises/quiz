@@ -77,9 +77,7 @@ func main() {
 			println("Time expire!")			
 			break
 		}
-		if strings.ToLower(strings.Trim(answer, "\n ")) != problems[i].answer {
-			break
-		} else {
+		if strings.ToLower(strings.Trim(answer, "\n ")) == problems[i].answer {
 			successAnswerCount++
 		}
 	}
