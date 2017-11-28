@@ -13,13 +13,14 @@ type MyQuiz struct {
 	Reader     *bufio.Reader "Reader for reading user answers"
 	tCorrect   int
 	tIncorrect int
+	tQuestions int
 }
 
 func (quiz *MyQuiz) run(questions map[string]string) {
 	if quiz.name != "" {
 		fmt.Printf("Starting %v quiz", quiz.name)
 	}
-
+	quiz.tQuestions = len(questions)
 	for ques, ans := range questions {
 		display(ques)
 		userAnswer := getUserAns(quiz.Reader)
@@ -46,13 +47,13 @@ func display(question string) {
 	fmt.Println(question)
 }
 
-func (quiz *MyQuiz) Start() {
+func (quiz *MyQuiz) Start(over chan bool) {
 	dat := ReadCsv(quiz.File)
 	quiz.run(dat)
-	quiz.result()
+	over <- true
 }
-func (quiz *MyQuiz) result() {
-	fmt.Printf("Correct: %v, incorrect: %v, total: %v\n", quiz.tCorrect, quiz.tIncorrect, quiz.tCorrect+quiz.tIncorrect)
+func (quiz *MyQuiz) Result() {
+	fmt.Printf("Correct: %v, incorrect: %v, total: %v\n", quiz.tCorrect, quiz.tIncorrect, quiz.tQuestions)
 }
 
 type Quiz interface {

@@ -9,6 +9,7 @@ import (
 
 func ReadCsv(file string) (ans map[string]string) {
 	f, err := os.Open(file)
+	defer f.Close()
 	Check(err)
 	reader := bufio.NewReader(f)
 	ans = make(map[string]string)
