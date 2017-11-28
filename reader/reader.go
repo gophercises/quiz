@@ -1,5 +1,5 @@
 // returns a map of csv file having two string columns
-package solution
+package reader
 
 import (
 	"bufio"

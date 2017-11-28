@@ -1,8 +1,10 @@
-package solution
+package business
 
 import (
 	"bufio"
 	"fmt"
+
+	"github.com/quiz/reader"
 )
 
 type MyQuiz struct {
@@ -48,7 +50,7 @@ func display(question string) {
 }
 
 func (quiz *MyQuiz) Start(over chan bool) {
-	dat := ReadCsv(quiz.File)
+	dat := reader.ReadCsv(quiz.File)
 	quiz.run(dat)
 	over <- true
 }

@@ -1,4 +1,4 @@
-package solution
+package reader
 
 import (
 	"log"

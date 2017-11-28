@@ -10,7 +10,7 @@ import (
 
 	"fmt"
 
-	"github.com/quiz/solution"
+	"github.com/quiz/business"
 )
 
 func main() {
@@ -26,7 +26,7 @@ func main() {
 	}
 	flag.Parse()
 
-	quiz := solution.MyQuiz{
+	quiz := business.MyQuiz{
 		File:   *file,
 		Reader: bufio.NewReader(os.Stdin),
 	}
