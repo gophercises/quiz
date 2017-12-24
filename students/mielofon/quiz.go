@@ -1,19 +1,14 @@
 package main
 
 import (
-	"bufio"
 	"encoding/csv"
+	"errors"
 	"flag"
 	"fmt"
-	"io"
 	"os"
 	"strings"
 	"time"
-	"errors"
 )
-
-var problemFileName = flag.String("csv", "./problems.csv", "a csv file in the format 'quastion,answer'")
-var limit = flag.Int("limit", 30, "the time limit for the quiz in seconds")
 
 type recordtype struct {
 	question string
@@ -21,12 +16,12 @@ type recordtype struct {
 }
 
 // ReadStringWithLimitTime - function read string from reader with time limit
-func  ReadStringWithLimitTime(limit int, reader *bufio.Reader) (string, error) {
+func ReadStringWithLimitTime(limit int) (string, error) {
 	timer := time.NewTimer(time.Duration(limit) * time.Second).C
 	doneChan := make(chan bool)
 	answer, err := "", error(nil)
 	go func() {
-		answer, err = reader.ReadString('\n')
+		fmt.Scanf("%s\n", &answer)
 		doneChan <- true
 	}()
 	for {
@@ -39,45 +34,54 @@ func  ReadStringWithLimitTime(limit int, reader *bufio.Reader) (string, error) {
 	}
 }
 
+// ParseLines  - parse lines from array of array of string to array of recordtype
+func ParseLines(lines [][]string) []recordtype {
+	ret := make([]recordtype, len(lines))
+	for i, line := range lines {
+		ret[i] = recordtype{
+			question: line[0],
+			answer:   strings.TrimSpace(line[1]),
+		}
+	}
+	return ret
+}
+
+func exit(msg string) {
+	fmt.Println(msg)
+	os.Exit(1)
+}
+
 func main() {
 
+	problemFileName := flag.String("csv", "./problems.csv", "a csv file in the format 'quastion,answer'")
+	limit := flag.Int("limit", 30, "the time limit for the quiz in seconds")
 	flag.Parse()
 
 	problemFile, err := os.Open(*problemFileName)
 	if err != nil {
-		fmt.Println(err)
-		return
+		exit(fmt.Sprintf("Failed to open the CSV file: %s\n", *problemFileName))
 	}
 
 	defer problemFile.Close() // close CSV file
 
 	readerProblem := csv.NewReader(problemFile)
-
-	var problems []recordtype
-
-	for {
-		record, err := readerProblem.Read()
-		if err == io.EOF {
-			break
-		}
-		if err != nil {
-			println(err)
-		}
-		problems = append(problems, recordtype{record[0], strings.ToLower(strings.Trim(record[1], "\n "))})
+	lines, err := readerProblem.ReadAll()
+	if err != nil {
+		exit("Failed to parse the provided CSV file.")
 	}
 
-	reader := bufio.NewReader(os.Stdin)
+	problems := ParseLines(lines)
 
 	successAnswerCount := 0
-	for i := range problems {
-		print("Problem #", i+1, ": ", problems[i].question, " = ")
+	for i, p := range problems {
+		fmt.Printf("Problem #%d: %s=", i+1, p.question)
 
-		answer, err := ReadStringWithLimitTime(*limit, reader)
+		answer, err := ReadStringWithLimitTime(*limit)
 		if err != nil {
-			println("Time expire!")			
+			println("Time expire!")
 			break
 		}
-		if strings.ToLower(strings.Trim(answer, "\n ")) == problems[i].answer {
+		if strings.ToLower(strings.Trim(answer, "\n ")) == p.answer {
 			successAnswerCount++
 		}
 	}
