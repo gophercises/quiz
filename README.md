@@ -1,6 +1,6 @@
 # Exercise #1: Quiz Game
 
-[![exercise status: released](https://img.shields.io/badge/video%20status-unreleased-green.svg?style=flat-square)](https://gophercises.com/exercises/quiz)
+[![exercise status: released](https://img.shields.io/badge/exercise%20status-released-green.svg?style=flat-square)](https://gophercises.com/exercises/quiz)
 
 
 ## Exercise details
