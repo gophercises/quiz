@@ -16,7 +16,6 @@ func main() {
 
 	flag.Parse()
 
-	// TODO read in csv of Q,A
 	file, err := os.Open(*filenamePtr)
 	handleError(err)
 	defer file.Close()
