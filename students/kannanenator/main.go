@@ -13,6 +13,7 @@ func main() {
 	
 	filenamePtr := flag.String("filename", "problems.csv", "file containing the set of problems")
 	limitPtr := flag.Int("limit", 30, "quiz time limit")
+	shufflePtr := flag.Bool("shuffle", false, "shuffle the quiz if true")
 
 	flag.Parse()
 
