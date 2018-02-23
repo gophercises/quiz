@@ -3,11 +3,12 @@ package main
 import (
 	"bufio"
 	"encoding/csv"
-	"encoding/json"
+	"flag"
 	"fmt"
 	"io"
 	"log"
 	"os"
+	"strings"
 )
 
 type item struct {
@@ -16,7 +17,10 @@ type item struct {
 }
 
 func main() {
-	csvFile, err := os.Open("problems.csv")
+	filepath := flag.String("csv", "problems.csv", "a csv file in the format of 'question,answer'")
+	flag.Parse()
+
+	csvFile, err := os.Open(*filepath)
 
 	if err != nil {
 		log.Fatal(err)
@@ -42,18 +46,28 @@ func main() {
 			log.Fatalf("expected line to have 2 elements, got %d for %v", len(line), line)
 		}
 
-
 		quiz = append(quiz, item{
 			Question: line[0],
 			Answer:   line[1],
 		})
 	}
 
-	resultsJSON, err := json.MarshalIndent(quiz, "", "    ")
+	possibleScore := len(quiz)
+	actualScore := 0
 
-	if err != nil {
-		log.Fatal(err)
+	for i, item := range quiz {
+		reader := bufio.NewReader(os.Stdin)
+		fmt.Printf("Problem #%d: %s = ", i, item.Question)
+		text, err := reader.ReadString('\n')
+
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		if strings.TrimSpace(text) == item.Answer {
+			actualScore++
+		}
 	}
 
-	fmt.Println(string(resultsJSON))
+	fmt.Printf("You scored %d out of %d.", actualScore, possibleScore)
 }
