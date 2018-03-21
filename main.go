@@ -9,6 +9,7 @@ import (
 	"log"
 	"os"
 	"strings"
+	"time"
 )
 
 type item struct {
@@ -55,19 +56,34 @@ func main() {
 	possibleScore := len(quiz)
 	actualScore := 0
 
-	for i, item := range quiz {
-		reader := bufio.NewReader(os.Stdin)
-		fmt.Printf("Problem #%d: %s = ", i, item.Question)
-		text, err := reader.ReadString('\n')
+	input := make(chan string)
+	go getUserInput(input)
 
+QuestionLoop:
+	for i, item := range quiz {
+		fmt.Printf("Problem #%d: %s = ", i, item.Question)
+
+		select {
+		case text := <-input:
+			if strings.TrimSpace(text) == item.Answer {
+				actualScore++
+			}
+		case <-time.After(2 * time.Second):
+			break QuestionLoop
+		}
+	}
+
+	fmt.Printf("\nYou scored %d out of %d.\n", actualScore, possibleScore)
+}
+
+func getUserInput(input chan string) {
+	for {
+		in := bufio.NewReader(os.Stdin)
+		result, err := in.ReadString('\n')
 		if err != nil {
 			log.Fatal(err)
 		}
 
-		if strings.TrimSpace(text) == item.Answer {
-			actualScore++
-		}
+		input <- result
 	}
-
-	fmt.Printf("You scored %d out of %d.", actualScore, possibleScore)
 }
