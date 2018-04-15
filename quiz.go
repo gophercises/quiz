@@ -19,18 +19,27 @@ var shuffle = flag.Int("shuffle", 0, "Pass in 1 to shuffle")
 func main() {
 	flag.Parse()
 
-	file, _ := os.Open("./problems.csv")
-	r := csv.NewReader(io.Reader(file))
-
-	problems, _ := r.ReadAll()
+	problems := readData()
 	if *shuffle == 1 {
 		problems = shuffleProblems(problems)
 	}
 
-	fmt.Println("Press ENTER to start...")
-	startReader := bufio.NewReader(os.Stdin)
-	startReader.ReadString('\n')
+	promptStart()
 	runQuiz(problems)
+}
+
+func readData() [][]string {
+	f, _ := os.Open("./problems.csv")
+	r := csv.NewReader(io.Reader(f))
+
+	problems, _ := r.ReadAll()
+	return problems
+}
+
+func promptStart() {
+	fmt.Println("Press ENTER to start...")
+	r := bufio.NewReader(os.Stdin)
+	r.ReadString('\n')
 }
 
 func shuffleProblems(data [][]string) [][]string {
