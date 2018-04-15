@@ -30,6 +30,7 @@ func main() {
 
 func readData() [][]string {
 	f, _ := os.Open("./problems.csv")
+	defer f.Close()
 	r := csv.NewReader(io.Reader(f))
 
 	problems, _ := r.ReadAll()
