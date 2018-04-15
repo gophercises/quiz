@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"encoding/csv"
+	"flag"
 	"fmt"
 	"io"
 	"os"
@@ -11,7 +12,11 @@ import (
 	"time"
 )
 
+var timelimit = flag.Int("tl", 30, "Timelimit for quiz")
+
 func main() {
+	flag.Parse()
+
 	file, _ := os.Open("./problems.csv")
 	r := csv.NewReader(io.Reader(file))
 
@@ -31,7 +36,7 @@ func runQuiz(problems [][]string) {
 	wg.Add(1)
 
 	go func() {
-		timer := time.NewTimer(30 * time.Second)
+		timer := time.NewTimer(time.Duration(*timelimit) * time.Second)
 		<-timer.C
 		fmt.Printf("\nTime's up!\n")
 		wg.Done()
