@@ -6,6 +6,7 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"math/rand"
 	"os"
 	"strings"
 	"sync"
@@ -13,6 +14,7 @@ import (
 )
 
 var timelimit = flag.Int("tl", 30, "Timelimit for quiz")
+var shuffle = flag.Int("shuffle", 0, "Pass in 1 to shuffle")
 
 func main() {
 	flag.Parse()
@@ -21,11 +23,25 @@ func main() {
 	r := csv.NewReader(io.Reader(file))
 
 	problems, _ := r.ReadAll()
+	if *shuffle == 1 {
+		problems = shuffleProblems(problems)
+	}
 
 	fmt.Println("Press ENTER to start...")
 	startReader := bufio.NewReader(os.Stdin)
 	startReader.ReadString('\n')
 	runQuiz(problems)
+}
+
+func shuffleProblems(data [][]string) [][]string {
+	r := rand.New(rand.NewSource(time.Now().Unix()))
+	shuf := make([][]string, len(data))
+	perm := r.Perm(len(data))
+	for i, randIndex := range perm {
+		shuf[i] = data[randIndex]
+	}
+
+	return shuf
 }
 
 func runQuiz(problems [][]string) {
@@ -51,7 +67,7 @@ func runQuiz(problems [][]string) {
 			r := bufio.NewReader(os.Stdin)
 			guess, _ := r.ReadString('\n')
 			guess = strings.TrimSpace(guess)
-			if strings.Compare(answer, guess) == 0 {
+			if strings.Compare(strings.ToLower(answer), strings.ToLower(guess)) == 0 {
 				correct++
 			}
 		}

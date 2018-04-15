@@ -8,7 +8,7 @@ This exercise is broken into two parts to help simplify the process of explainin
 
 *Note: I didn't break this into multiple exercises like I do for some exercises because both of these combined should only take ~30m to cover in screencasts.*
 
-### Part 1
+### Part 1 (Done)
 
 Create a program that will read in a quiz provided via a CSV file (more details below) and will then give the quiz to a user keeping track of how many questions they get right and how many they get incorrect. Regardless of whether the answer is correct or wrong the next question should be asked immediately afterwards.
 
@@ -38,7 +38,7 @@ At the end of the quiz the program should output the total number of questions c
 
 **NOTE:** *CSV files may have questions with commas in them. Eg: `"what 2+2, sir?",4` is a valid row in a CSV. I suggest you look into the CSV package in Go and don't try to write your own CSV parser.*
 
-### Part 2
+### Part 2 (Done)
 
 Adapt your program from part 1 to add a timer. The default time limit should be 30 seconds, but should also be customizable via a flag.
 
@@ -48,7 +48,7 @@ Users should be asked to press enter (or some other key) before the timer starts
 
 At the end of the quiz the program should still output the total number of questions correct and how many questions there were in total. Questions given invalid answers or unanswered are considered incorrect.
 
-## Bonus
+## Bonus (Done)
 
 As a bonus exercises you can also...
 
