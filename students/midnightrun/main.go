@@ -71,7 +71,7 @@ L:
 				correctAnswers = correctAnswers + 1
 			}
 		case <-time.After(time.Duration(*limit) * time.Second):
-			println("Times up!")
+			fmt.Println("Times up!")
 			break L
 		}
 	}
