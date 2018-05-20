@@ -4,19 +4,15 @@ import (
 	"encoding/csv"
 	"io"
 	"log"
+
+	"github.com/hackeryarn/quiz/students/hackeryarn/problem"
 )
 
-// Problem represents a single question answer pair
-type Problem struct {
-	question string
-	answer   string
-}
-
 // ReadCSV parses the CSV file into a Problem struct
-func ReadCSV(reader io.Reader) []Problem {
+func ReadCSV(reader io.Reader) []problem.Problem {
 	csvReader := csv.NewReader(reader)
 
-	problems := []Problem{}
+	problems := []problem.Problem{}
 	for {
 		record, err := csvReader.Read()
 		if err == io.EOF {
@@ -25,8 +21,7 @@ func ReadCSV(reader io.Reader) []Problem {
 			log.Fatalln("Error reading CSV:", err)
 		}
 
-		problem := Problem{question: record[0], answer: record[1]}
-		problems = append(problems, problem)
+		problems = append(problems, problem.New(record))
 	}
 
 	return problems
