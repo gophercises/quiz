@@ -2,10 +2,9 @@ package main
 
 import (
 	"encoding/csv"
+	"gophercises/quiz/students/hackeryarn/problem"
 	"io"
 	"log"
-
-	"github.com/hackeryarn/quiz/students/hackeryarn/problem"
 )
 
 // ReadCSV parses the CSV file into a Problem struct

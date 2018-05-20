@@ -2,10 +2,9 @@ package main
 
 import (
 	"bytes"
+	"gophercises/quiz/students/hackeryarn/problem"
 	"reflect"
 	"testing"
-
-	"github.com/hackeryarn/quiz/students/hackeryarn/problem"
 )
 
 func TestReadCSV(t *testing.T) {

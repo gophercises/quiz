@@ -11,6 +11,6 @@ func TestNew(t *testing.T) {
 	got := New(record)
 
 	if got != want {
-		expected("expected to create problem %v got %v", want, got)
+		t.Errorf("expected to create problem %v got %v", want, got)
 	}
 }

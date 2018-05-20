@@ -1,4 +1,4 @@
-package main
+package problem
 
 // Problem represents a single question answer pair
 type Problem struct {
