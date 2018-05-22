@@ -2,7 +2,6 @@ package problem
 
 import (
 	"bufio"
-	"io"
 	"log"
 	"strings"
 )
@@ -14,8 +13,8 @@ type Problem struct {
 }
 
 // CheckAnswer checks the answer against the provided input
-func (p Problem) CheckAnswer(input io.Reader) bool {
-	answer := readAnswer(input)
+func (p Problem) CheckAnswer(scanner *bufio.Scanner) bool {
+	answer := readAnswer(scanner)
 
 	if answer != p.answer {
 		return false
@@ -23,14 +22,13 @@ func (p Problem) CheckAnswer(input io.Reader) bool {
 	return true
 }
 
-func readAnswer(input io.Reader) string {
-	reader := bufio.NewReader(input)
-	answerString, err := reader.ReadString('\n')
-	if err != nil {
-		log.Fatalln("Error reading in answer:", err)
+func readAnswer(scanner *bufio.Scanner) string {
+	ok := scanner.Scan()
+	if !ok {
+		log.Fatalln("Error reading in answer")
 	}
 
-	return strings.TrimSpace(answerString)
+	return strings.TrimSpace(scanner.Text())
 }
 
 // New creates a Problem from a provided CSV record
