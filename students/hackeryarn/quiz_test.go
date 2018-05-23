@@ -11,16 +11,25 @@ import (
 
 type flaggerMock struct {
 	stringVarCalls  int
-	stringVarNames  []string
-	stringVarValues []string
-	stringVarUsages []string
+	intVarCalls     int
+	varNames        []string
+	varUsages       []string
+	varStringValues []string
+	varIntValues    []int
 }
 
 func (f *flaggerMock) StringVar(p *string, name, value, usage string) {
 	f.stringVarCalls++
-	f.stringVarNames = append(f.stringVarNames, name)
-	f.stringVarValues = append(f.stringVarValues, value)
-	f.stringVarUsages = append(f.stringVarUsages, usage)
+	f.varNames = append(f.varNames, name)
+	f.varStringValues = append(f.varStringValues, value)
+	f.varUsages = append(f.varUsages, usage)
+}
+
+func (f *flaggerMock) IntVar(p *int, name string, value int, usage string) {
+	f.intVarCalls++
+	f.varNames = append(f.varNames, name)
+	f.varIntValues = append(f.varIntValues, value)
+	f.varUsages = append(f.varUsages, usage)
 }
 
 func TestReadCSV(t *testing.T) {
@@ -47,29 +56,53 @@ func TestConfigFlags(t *testing.T) {
 
 	ConfigFlags(flagger)
 
-	assertStringVars(t, flagger)
+	assertStringCalls(t, flagger)
+	assertIntCalls(t, flagger)
+	assertFlags(t, flagger)
 }
 
-func assertStringVars(t *testing.T, flagger *flaggerMock) {
+func assertStringCalls(t *testing.T, flagger *flaggerMock) {
+	t.Helper()
+	if flagger.stringVarCalls != 1 {
+		t.Errorf("it should call StringVar %d times, called %d",
+			1, flagger.stringVarCalls)
+	}
+}
+
+func assertIntCalls(t *testing.T, flagger *flaggerMock) {
+	t.Helper()
+	if flagger.intVarCalls != 1 {
+		t.Errorf("it should call IntVar %d times, called %d",
+			1, flagger.intVarCalls)
+	}
+}
+
+func assertFlags(t *testing.T, flagger *flaggerMock) {
 	t.Helper()
 
-	if flagger.stringVarCalls != 1 {
-		t.Errorf("it should call StringVars %d times, called %d", 1, flagger.stringVarCalls)
+	expectedNames := []string{FileFlag, TimerFlag}
+	expectedUsages := []string{FileFlagUsage, TimerFlagUsage}
+	expectedStringValues := []string{FileFlagValue}
+	expectedIntValues := []int{TimerFlagValue}
+
+	if !reflect.DeepEqual(expectedNames, flagger.varNames) {
+		t.Errorf("it should setup flag names to be %v, got %v",
+			expectedNames, flagger.varNames)
 	}
 
-	expectedNames := []string{FileFlag}
-	expectedValues := []string{FileFlagValue}
-	expectedUsages := []string{FileFlagUsage}
-
-	if !reflect.DeepEqual(expectedNames, flagger.stringVarNames) {
-		t.Errorf("it should setup StringVar names to be %v, got %v", expectedNames, flagger.stringVarNames)
+	if !reflect.DeepEqual(expectedUsages, flagger.varUsages) {
+		t.Errorf("it should setup flag usages to be %v, got %v",
+			expectedUsages, flagger.varUsages)
 	}
 
-	if !reflect.DeepEqual(expectedValues, flagger.stringVarValues) {
-		t.Errorf("it should setup StringVar values to be %v, got %v", expectedValues, flagger.stringVarValues)
+	if !reflect.DeepEqual(expectedStringValues, flagger.varStringValues) {
+		t.Errorf("it should setup string values to be %v, got %v",
+			expectedStringValues, flagger.varStringValues)
 	}
 
-	if !reflect.DeepEqual(expectedUsages, flagger.stringVarUsages) {
-		t.Errorf("it should setup StringVar usages to be %v, got %v", expectedUsages, flagger.stringVarUsages)
+	if !reflect.DeepEqual(expectedIntValues, flagger.varIntValues) {
+		t.Errorf("it should setup int values to be %v, got %v",
+			expectedIntValues, flagger.varIntValues)
 	}
+
 }
