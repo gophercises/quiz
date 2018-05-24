@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"reflect"
 	"testing"
+	"time"
 
 	"github.com/gophercises/quiz/students/hackeryarn/problem"
 	"github.com/gophercises/quiz/students/hackeryarn/quiz"
@@ -30,6 +31,15 @@ func (f *flaggerMock) IntVar(p *int, name string, value int, usage string) {
 	f.varNames = append(f.varNames, name)
 	f.varIntValues = append(f.varIntValues, value)
 	f.varUsages = append(f.varUsages, usage)
+}
+
+type timerMock struct {
+	duration int
+}
+
+func (t *timerMock) NewTimer(d time.Duration) *time.Timer {
+	t.duration = int(d.Seconds())
+	return time.NewTimer(1 * time.Millisecond)
 }
 
 func TestReadCSV(t *testing.T) {
@@ -59,6 +69,24 @@ func TestConfigFlags(t *testing.T) {
 	assertStringCalls(t, flagger)
 	assertIntCalls(t, flagger)
 	assertFlags(t, flagger)
+}
+
+func TestStartTimer(t *testing.T) {
+	timer := &timerMock{}
+	w := &bytes.Buffer{}
+	r := bytes.NewBufferString("\n")
+	TimerSeconds := 30
+
+	StartTimer(w, r, timer)
+
+	if timer.duration != TimerSeconds {
+		t.Errorf("it should set timer for %d seconds, set for %d",
+			TimerSeconds, timer.duration)
+	}
+
+	if w.String() != "Ready to start?" {
+		t.Errorf("it should ask user if the user is ready, got %s", w.String())
+	}
 }
 
 func assertStringCalls(t *testing.T, flagger *flaggerMock) {

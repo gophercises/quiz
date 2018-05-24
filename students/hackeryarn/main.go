@@ -3,9 +3,11 @@ package main
 import (
 	"encoding/csv"
 	"flag"
+	"fmt"
 	"io"
 	"log"
 	"os"
+	"time"
 
 	"github.com/gophercises/quiz/students/hackeryarn/problem"
 	"github.com/gophercises/quiz/students/hackeryarn/quiz"
@@ -43,6 +45,17 @@ func (q *quizFlagger) IntVar(p *int, name string, value int, usage string) {
 	flag.IntVar(p, name, value, usage)
 }
 
+// Timer is used to start a timer
+type Timer interface {
+	NewTimer(d time.Duration) *time.Timer
+}
+
+type quizTimer struct{}
+
+func (q quizTimer) NewTimer(d time.Duration) *time.Timer {
+	return time.NewTimer(d)
+}
+
 // ReadCSV parses the CSV file into a Problem struct
 func ReadCSV(reader io.Reader) quiz.Quiz {
 	csvReader := csv.NewReader(reader)
@@ -62,13 +75,22 @@ func ReadCSV(reader io.Reader) quiz.Quiz {
 	return quiz.New(problems)
 }
 
+// TimerSeconds is the amount of time allowed for the quiz
+var TimerSeconds int
 var file string
-var timeSeconds int
 
 // ConfigFlags sets all the flags used by the application
 func ConfigFlags(f Flagger) {
 	f.StringVar(&file, FileFlag, FileFlagValue, FileFlagUsage)
-	f.IntVar(&timeSeconds, TimerFlag, TimerFlagValue, TimerFlagUsage)
+	f.IntVar(&TimerSeconds, TimerFlag, TimerFlagValue, TimerFlagUsage)
+}
+
+// StartTimer begins a timer once the user provides input
+func StartTimer(w io.Writer, r io.Reader, timer Timer) *time.Timer {
+	fmt.Fprint(w, "Ready to start?")
+	fmt.Fscanln(r)
+
+	return timer.NewTimer(time.Second * time.Duration(TimerSeconds))
 }
 
 func init() {
