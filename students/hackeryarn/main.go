@@ -9,8 +9,8 @@ import (
 	"os"
 	"time"
 
+	quiz "github.com/gophercises/quiz/students/hackeryarn/myquiz"
 	"github.com/gophercises/quiz/students/hackeryarn/problem"
-	"github.com/gophercises/quiz/students/hackeryarn/quiz"
 )
 
 const (
