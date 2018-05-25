@@ -107,5 +107,14 @@ func main() {
 	}
 
 	quiz := ReadCSV(file)
+
+	timer := StartTimer(os.Stdout, os.Stdin, quizTimer{})
+	go func() {
+		<-timer.C
+		fmt.Println("")
+		quiz.PrintResults(os.Stdout)
+		os.Exit(0)
+	}()
+
 	quiz.Run(os.Stdout, os.Stdin)
 }
