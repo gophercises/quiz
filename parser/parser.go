@@ -7,7 +7,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/fedepaol/quiz/quiz"
+	"github.com/fedepaol/quiz/goquiz"
 )
 
 func ParseFile(filename string) (res quiz.Quiz, e error) {

@@ -3,7 +3,7 @@ package parser
 import (
 	"testing"
 
-	"github.com/fedepaol/quiz/quiz"
+	"github.com/fedepaol/quiz/goquiz"
 )
 
 var qtests = []struct {
