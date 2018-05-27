@@ -1,5 +1,11 @@
 package quiz
 
+import (
+	"fmt"
+
+	"github.com/fedepaol/quiz/interaction"
+)
+
 // Question represents a single quiz question with answer.
 type Question struct {
 	Question string
@@ -13,8 +19,10 @@ type QuestionService interface {
 
 // Quiz represents a quiz run with all the questions and answers.
 type Quiz struct {
-	questions []Question
-	Results   []bool
+	questions   []Question
+	Results     []bool
+	asker       interaction.Asker
+	goodreplies int
 }
 
 // QuizService holds all the methods that can be applied to a Quiz.
@@ -23,10 +31,21 @@ type QuizService interface {
 	AddQuestion(Question)
 }
 
+// Run runs an iteration of a quiz.
 func (q *Quiz) Run() {
-	panic("not implemented")
+	for _, qq := range q.questions {
+		reply := q.asker.Ask(qq.Question)
+		if reply == qq.Answer {
+			q.goodreplies++
+		}
+	}
+
+	msg := fmt.Sprintf("You got %d out of %d right questions", q.goodreplies, len(q.questions))
+	q.asker.Notify(msg)
+	q.goodreplies = 0
 }
 
+// AddQuestion adds a question to the quiz.
 func (q *Quiz) AddQuestion(question Question) {
 	q.questions = append(q.questions, question)
 }
