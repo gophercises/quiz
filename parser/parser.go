@@ -10,6 +10,7 @@ import (
 	"github.com/fedepaol/quiz/goquiz"
 )
 
+// ParseFile parses a file and returns a quiz filled with questions.
 func ParseFile(filename string) (res quiz.Quiz, e error) {
 	file, err := os.Open(filename)
 	if err != nil {
@@ -33,6 +34,7 @@ func parseQuestion(row []string) (quiz.Question, error) {
 // ParseQuestions returns a quiz based on a csv reader.
 func parseQuestions(reader io.Reader) (res quiz.Quiz, e error) {
 	r := csv.NewReader(reader)
+	r.FieldsPerRecord = -1
 
 	for {
 		record, err := r.Read()

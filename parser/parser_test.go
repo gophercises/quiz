@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/fedepaol/quiz/goquiz"
@@ -24,5 +25,15 @@ func TestParsingQuestion(t *testing.T) {
 		if q != tt.q {
 			t.Errorf("got %q, want %q", q, tt.q)
 		}
+	}
+}
+
+var testQuestions = `1+2,3
+what 2+2, sir?,4`
+
+func TestParsingQuestions(t *testing.T) {
+	_, err := parseQuestions(strings.NewReader(testQuestions))
+	if err != nil {
+		t.Errorf("Error for %s", testQuestions)
 	}
 }
