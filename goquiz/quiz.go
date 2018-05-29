@@ -2,6 +2,7 @@ package quiz
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/fedepaol/quiz/interaction"
 )
@@ -33,13 +34,33 @@ type QuizService interface {
 
 // Run runs an iteration of a quiz.
 func (q *Quiz) Run() {
-	for _, qq := range q.questions {
-		reply := q.asker.Ask(qq.Question)
-		if reply == qq.Answer {
-			q.goodreplies++
+	replies := make(chan bool)
+
+	go func() {
+		for _, qq := range q.questions {
+			reply := q.asker.Ask(qq.Question)
+
+			if reply == qq.Answer {
+				replies <- true
+			} else {
+				replies <- false
+			}
+		}
+	}()
+
+	timer := time.NewTimer(2 * time.Second)
+
+T:
+	for {
+		select {
+		case success := <-replies:
+			if success {
+				q.goodreplies++
+			}
+		case <-timer.C:
+			break T
 		}
 	}
-
 	msg := fmt.Sprintf("You got %d out of %d right questions", q.goodreplies, len(q.questions))
 	q.asker.Notify(msg)
 	q.goodreplies = 0
