@@ -1,7 +1,6 @@
 package quiz
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/fedepaol/quiz/interaction"
@@ -20,10 +19,14 @@ type QuestionService interface {
 
 // Quiz represents a quiz run with all the questions and answers.
 type Quiz struct {
-	questions   []Question
-	Results     []bool
-	asker       interaction.Asker
-	goodreplies int
+	questions    []Question
+	asker        interaction.Asker
+	questionsnum int
+}
+
+type Result struct {
+	goodreplies    int
+	questionsasked int
 }
 
 // QuizService holds all the methods that can be applied to a Quiz.
@@ -33,7 +36,7 @@ type QuizService interface {
 }
 
 // Run runs an iteration of a quiz.
-func (q *Quiz) Run() {
+func (q *Quiz) Run(timeout chan time.Time) (res Result) {
 	replies := make(chan bool)
 
 	go func() {
@@ -46,24 +49,26 @@ func (q *Quiz) Run() {
 				replies <- false
 			}
 		}
+		close(replies)
 	}()
-
-	timer := time.NewTimer(2 * time.Second)
 
 T:
 	for {
 		select {
-		case success := <-replies:
-			if success {
-				q.goodreplies++
+		case success, ok := <-replies:
+			if !ok {
+				break T
 			}
-		case <-timer.C:
+
+			if success {
+				res.goodreplies++
+			}
+			res.questionsasked++
+		case <-timeout:
 			break T
 		}
 	}
-	msg := fmt.Sprintf("You got %d out of %d right questions", q.goodreplies, len(q.questions))
-	q.asker.Notify(msg)
-	q.goodreplies = 0
+	return
 }
 
 // AddQuestion adds a question to the quiz.
