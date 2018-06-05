@@ -1,6 +1,7 @@
 package quiz
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/fedepaol/quiz/interaction"
@@ -74,4 +75,9 @@ T:
 // AddQuestion adds a question to the quiz.
 func (q *Quiz) AddQuestion(question Question) {
 	q.questions = append(q.questions, question)
+}
+
+func (r Result) String() (res string) {
+	res = fmt.Sprintf("%d good replies out of %d questions asked", r.goodreplies, r.questionsasked)
+	return
 }

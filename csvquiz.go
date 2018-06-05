@@ -22,5 +22,6 @@ func main() {
 	quiz.Asker = interaction.NewAsker()
 
 	to := time.NewTimer(time.Duration(*timeout) * time.Second)
-	quiz.Run(to.C)
+	res := quiz.Run(to.C)
+	fmt.Printf("\n%s", res)
 }
