@@ -16,7 +16,7 @@ func main() {
 	flag.Parse()
 	quiz, err := parser.ParseFile(*csvname)
 	if err != nil {
-		fmt.Errorf("error %v", err)
+		fmt.Printf("error %v", err)
 		return
 	}
 	quiz.Asker = interaction.NewAsker()
