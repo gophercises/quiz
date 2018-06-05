@@ -20,7 +20,7 @@ type QuestionService interface {
 // Quiz represents a quiz run with all the questions and answers.
 type Quiz struct {
 	questions    []Question
-	asker        interaction.Asker
+	Asker        interaction.Asker
 	questionsnum int
 }
 
@@ -36,12 +36,12 @@ type QuizService interface {
 }
 
 // Run runs an iteration of a quiz.
-func (q *Quiz) Run(timeout chan time.Time) (res Result) {
+func (q *Quiz) Run(timeout <-chan time.Time) (res Result) {
 	replies := make(chan bool)
 
 	go func() {
 		for _, qq := range q.questions {
-			reply := q.asker.Ask(qq.Question)
+			reply := q.Asker.Ask(qq.Question)
 
 			if reply == qq.Answer {
 				replies <- true

@@ -28,7 +28,7 @@ func (m MockAsker) Notify(string) {
 
 func TestQuiz(t *testing.T) {
 	reschan := make(chan Result)
-	q := Quiz{questions: qq, asker: MockAsker{}}
+	q := Quiz{questions: qq, Asker: MockAsker{}}
 	timeout := make(chan time.Time)
 	go func() {
 		reschan <- q.Run(timeout)
@@ -59,7 +59,7 @@ func TestTimeout(t *testing.T) {
 	reschan := make(chan Result)
 
 	a := MockAskerTimeout{timeout: make(chan time.Time)}
-	q := Quiz{questions: qq, asker: a}
+	q := Quiz{questions: qq, Asker: a}
 	go func() {
 		reschan <- q.Run(a.timeout)
 	}()
