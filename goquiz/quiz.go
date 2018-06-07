@@ -43,7 +43,6 @@ func (q *Quiz) Run(timeout <-chan time.Time) (res Result) {
 	go func() {
 		for _, qq := range q.questions {
 			reply := q.Asker.Ask(qq.Question)
-
 			if reply == qq.Answer {
 				replies <- true
 			} else {

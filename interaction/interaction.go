@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strings"
 )
 
 // Interactor is used to fetch display questions and retrieve replies.
@@ -23,7 +24,7 @@ type Asker interface {
 func (a Terminal) Ask(question string) string {
 	fmt.Printf("%s = ", question)
 	text, _ := a.reader.ReadString('\n')
-	return text
+	return strings.TrimSpace(text)
 }
 
 // Notify notifies the user of a message.
