@@ -6,21 +6,41 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"path/filepath"
 	"strings"
+	"time"
 )
+
+func startTime(timer time.Timer, duration time.Duration) {
+	<-timer.C
+	fmt.Println(duration, "doldu")
+}
 
 func main() {
 	filename := flag.String("file", "problems.csv", "Questions file")
+	timelimit := flag.Int("time", 30, "Time limit of quiz in seconds")
 	flag.Parse()
 
-	csvF, csvErr := ioutil.ReadFile(*filename)
+	filePath, pathErr := filepath.Abs(*filename)
+	if pathErr != nil {
+		log.Fatal("file not found. check if it exists again.")
+	}
+
+	remainTime := time.Duration(*timelimit) * time.Second
+	fmt.Println("Press return to start time (", remainTime, ")")
+	fmt.Scanln() //and time starts
+
+	timer := time.NewTimer(remainTime)
+	go startTime(*timer, remainTime)
+
+	csvF, csvErr := ioutil.ReadFile(filePath)
 	if csvErr != nil {
-		log.Fatal("Dosya bulunamadı veya bir sıkıntısı var. Detay: " + csvErr.Error())
+		log.Fatal("error reading file: " + csvErr.Error())
 	}
 
 	probs, probErr := csv.NewReader(strings.NewReader(string(csvF))).ReadAll()
 	if probErr != nil {
-		log.Fatal("CSV düzgün formatlanmamış. Detay: " + probErr.Error())
+		log.Fatal("error on CSV format: " + probErr.Error())
 	}
 
 	var answer string
@@ -31,7 +51,6 @@ func main() {
 		fmt.Scan(&answer)
 		if answer == soru[1] {
 			trues++
-			//log.Fatal(answer + " Cevap " + soru[1])
 		}
 		total++
 	}
