@@ -1,24 +1,6 @@
 # Exercise #1: Quiz Game
 
-This exercise is broken into two parts.
-
-#### Part 1
-
-[![topic: csvs](https://img.shields.io/badge/topic-csvs-green.svg?style=flat-square)](https://github.com/search?q=topic%3Acsvs+org%3Agophercises&type=Repositories)
-[![topic: flags](https://img.shields.io/badge/topic-flags-green.svg?style=flat-square)](https://github.com/search?q=topic%3Aflags+org%3Agophercises&type=Repositories)
-[![topic: opening files](https://img.shields.io/badge/topic-files-green.svg?style=flat-square)](https://github.com/search?q=topic%3Aos%2Dpackage+org%3Agophercises&type=Repositories)
-[![topic: strings](https://img.shields.io/badge/topic-strings-green.svg?style=flat-square)](https://github.com/search?q=topic%3Astrings+org%3Agophercises&type=Repositories)
-
-#### Part 2
-
-[![topic: goroutines](https://img.shields.io/badge/topic-goroutines-green.svg?style=flat-square)](https://github.com/search?q=topic%3Agoroutines+org%3Agophercises&type=Repositories)
-[![topic: channels](https://img.shields.io/badge/topic-channels-green.svg?style=flat-square)](https://github.com/search?q=topic%3Achannels+org%3Agophercises&type=Repositories)
-[![topic: timers](https://img.shields.io/badge/topic-timers-green.svg?style=flat-square)](https://github.com/search?q=topic%3Atime$2Dpackages+org%3Agophercises&type=Repositories)
-
-
-
-![video status: unreleased](https://img.shields.io/badge/video%20status-unreleased-red.svg?style=flat-square)
-![code status: unreleased](https://img.shields.io/badge/code%20status-unreleased-red.svg?style=flat-square)
+[![exercise status: released](https://img.shields.io/badge/exercise%20status-released-green.svg?style=for-the-badge)](https://gophercises.com/exercises/quiz)
 
 ## Exercise details
 
@@ -30,7 +12,7 @@ This exercise is broken into two parts to help simplify the process of explainin
 
 Create a program that will read in a quiz provided via a CSV file (more details below) and will then give the quiz to a user keeping track of how many questions they get right and how many they get incorrect. Regardless of whether the answer is correct or wrong the next question should be asked immediately afterwards.
 
-The CSV file should default to [problems.csv](problems.csv), but the user should be able to customize the filename via a flag.
+The CSV file should default to `problems.csv` (example shown below), but the user should be able to customize the filename via a flag.
 
 The CSV file will be in a format like below, where the first column is a question and the second column in the same row is the answer to that question.
 
@@ -53,6 +35,8 @@ The CSV file will be in a format like below, where the first column is a questio
 You can assume that quizzes will be relatively short (< 100 questions) and will have single word/number answers.
 
 At the end of the quiz the program should output the total number of questions correct and how many questions there were in total. Questions given invalid answers are considered incorrect.
+
+**NOTE:** *CSV files may have questions with commas in them. Eg: `"what 2+2, sir?",4` is a valid row in a CSV. I suggest you look into the CSV package in Go and don't try to write your own CSV parser.*
 
 ### Part 2
 
