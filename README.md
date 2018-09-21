@@ -8,7 +8,7 @@ This exercise is broken into two parts to help simplify the process of explainin
 
 *Note: I didn't break this into multiple exercises like I do for some exercises because both of these combined should only take ~30m to cover in screencasts.*
 
-### Part 1
+### Part 1 HYETA
 
 Create a program that will read in a quiz provided via a CSV file (more details below) and will then give the quiz to a user keeping track of how many questions they get right and how many they get incorrect. Regardless of whether the answer is correct or wrong the next question should be asked immediately afterwards.
 
