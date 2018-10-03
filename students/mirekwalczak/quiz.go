@@ -26,6 +26,7 @@ func readCSV(file string) ([]Quiz, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer f.Close()
 	var quizes []Quiz
 	r := csv.NewReader(f)
 	for {
@@ -44,21 +45,14 @@ func readCSV(file string) ([]Quiz, error) {
 	return quizes, nil
 }
 
-func main() {
-	var f string
-	flag.StringVar(&f, "f", "problems.csv", "input file in csv format")
-	flag.Parse()
-	reader := bufio.NewReader(os.Stdin)
-	recs, err := readCSV(f)
-	if err != nil {
-		log.Fatal(err)
-	}
+func quiz(records []Quiz) (*Stat, error) {
 	var stat Stat
-	for _, elem := range recs {
+	reader := bufio.NewReader(os.Stdin)
+	for _, elem := range records {
 		fmt.Print(elem.question, ":")
 		ans, err := reader.ReadString('\n')
 		if err != nil {
-			log.Fatal(err)
+			return nil, err
 		}
 		stat.all++
 		if strings.TrimRight(ans, "\r\n") == elem.answer {
@@ -67,6 +61,20 @@ func main() {
 			stat.incorrect++
 		}
 	}
-	fmt.Printf("Question answered: %v, Correct: %v, Incorrect: %v\n", stat.all, stat.correct, stat.incorrect)
+	return &stat, nil
+}
 
+func main() {
+	var f string
+	flag.StringVar(&f, "f", "problems.csv", "input file in csv format")
+	flag.Parse()
+	recs, err := readCSV(f)
+	if err != nil {
+		log.Fatal(err)
+	}
+	stat, err := quiz(recs)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Printf("Question answered: %v, Correct: %v, Incorrect: %v\n", stat.all, stat.correct, stat.incorrect)
 }
