@@ -9,6 +9,7 @@ import (
 	"log"
 	"os"
 	"strings"
+	"time"
 )
 
 // Quiz is structure for questions and answers
@@ -45,36 +46,53 @@ func readCSV(file string) ([]Quiz, error) {
 	return quizes, nil
 }
 
-func quiz(records []Quiz) (*Stat, error) {
+func quiz(records []Quiz, timeout int) (*Stat, error) {
 	var stat Stat
 	reader := bufio.NewReader(os.Stdin)
-	for _, elem := range records {
-		fmt.Print(elem.question, ":")
-		ans, err := reader.ReadString('\n')
-		if err != nil {
-			return nil, err
+
+	timer := time.NewTimer(time.Second * time.Duration(timeout))
+	finish := make(chan bool)
+	errs := make(chan error)
+
+	go func() {
+		for _, quiz := range records {
+			fmt.Print(quiz.question, ":")
+
+			ans, err := reader.ReadString('\n')
+			if err != nil {
+				errs <- err
+			}
+			stat.all++
+			if strings.TrimRight(ans, "\r\n") == quiz.answer {
+				stat.correct++
+			} else {
+				stat.incorrect++
+			}
 		}
-		stat.all++
-		if strings.TrimRight(ans, "\r\n") == elem.answer {
-			stat.correct++
-		} else {
-			stat.incorrect++
-		}
+		finish <- true
+	}()
+
+	select {
+	case <-errs:
+		return nil, <-errs
+	case <-timer.C:
+		fmt.Println("\ntime's up!")
 	}
+
 	return &stat, nil
 }
 
 func main() {
-	var f string
-	flag.StringVar(&f, "f", "problems.csv", "input file in csv format")
+	f := flag.String("f", "problems.csv", "input file in csv format")
+	t := flag.Int("t", 30, "timeout for the quiz, in seconds")
 	flag.Parse()
-	recs, err := readCSV(f)
+	recs, err := readCSV(*f)
 	if err != nil {
 		log.Fatal(err)
 	}
-	stat, err := quiz(recs)
+	stat, err := quiz(recs, *t)
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Printf("Question answered: %v, Correct: %v, Incorrect: %v\n", stat.all, stat.correct, stat.incorrect)
+	fmt.Printf("\nQuestion answered: %v, Correct: %v, Incorrect: %v\n", stat.all, stat.correct, stat.incorrect)
 }
