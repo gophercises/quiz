@@ -51,7 +51,6 @@ func quiz(records []Quiz, timeout int) (*Stat, error) {
 	reader := bufio.NewReader(os.Stdin)
 
 	timer := time.NewTimer(time.Second * time.Duration(timeout))
-	finish := make(chan bool)
 	errs := make(chan error)
 
 	go func() {
@@ -69,7 +68,6 @@ func quiz(records []Quiz, timeout int) (*Stat, error) {
 				stat.incorrect++
 			}
 		}
-		finish <- true
 	}()
 
 	select {
