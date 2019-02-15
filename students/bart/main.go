@@ -55,12 +55,16 @@ func (quiz *quiz) run() {
 quizLoop:
 	for _, question := range quiz.questions {
 		fmt.Println(question.question)
-		scanner.Scan()
-		answer := scanner.Text()
+		answerCh := make(chan string)
+		go func() {
+			scanner.Scan()
+			answer := scanner.Text()
+			answerCh <- answer
+		}()
 		select {
 		case <-timer.C:
 			break quizLoop
-		default:
+		case answer := <-answerCh:
 			if answer == question.answer {
 				quiz.answeredCorrectly++
 			}
@@ -82,7 +86,7 @@ func (quiz *quiz) report() {
 
 var (
 	scanner     = bufio.NewScanner(os.Stdin)
-	filePathPtr = flag.String("file", "../problems.csv", "Path to csv file containing quiz.")
+	filePathPtr = flag.String("file", "./problems.csv", "Path to csv file containing quiz.")
 	timeLimit   = flag.Int64("time-limit", 30, "Set the total time in seconds allowed for the quiz.")
 )
 
