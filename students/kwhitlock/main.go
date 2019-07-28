@@ -1,12 +1,14 @@
 package main
 
 import (
-	"fmt"
-	"os"
 	"bufio"
-	"log"
-	"strings"
 	"flag"
+	"fmt"
+	"log"
+	"os"
+	"strings"
+	"sync"
+	"time"
 )
 
 var totalScore = 0
@@ -34,8 +36,24 @@ func compareAnswers(answer, userAnswer string) {
 	}
 }
 
-func main(){
+func timer(wg *sync.WaitGroup, lengthOfTime int) {
+	defer wg.Done()
+	time.Sleep(time.Second * time.Duration(lengthOfTime))
+}
+
+func quiz(wg *sync.WaitGroup, scanner *bufio.Scanner) {
+	defer wg.Done()
+	for scanner.Scan() {
+		answer := sendQuestion(scanner.Text())
+		userAnswer := getUserAnswer()
+		compareAnswers(answer, userAnswer)
+	}
+}
+
+func main() {
 	questions := flag.String("questions", "./problems.csv", "Filepath/name of CSV file where the questions are stored.")
+	lengthOfTime := flag.Int("time", 30, "Time in seconds to run quiz for.")
+
 	flag.Parse()
 
 	fmt.Println("Running Quiz")
@@ -49,11 +67,14 @@ func main(){
 
 	scanner := bufio.NewScanner(file)
 
-	for scanner.Scan() {
-		answer := sendQuestion(scanner.Text())
-		userAnswer := getUserAnswer()
-		compareAnswers(answer, userAnswer)
-	}
+	var wg sync.WaitGroup
+
+	wg.Add(1)
+	fmt.Println("Ready to start quiz? (press enter)")
+	getUserAnswer()
+	go timer(&wg, *lengthOfTime)
+	go quiz(&wg, scanner)
+	wg.Wait()
 
 	if err := scanner.Err(); err != nil {
 		fmt.Println("ERROR")
