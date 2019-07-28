@@ -9,11 +9,13 @@ import (
 	"log"
 	"os"
 	"strings"
+	"time"
 )
 
 func main() {
 	// Grab the problems file from the cli
-	var file = flag.String("filename", "problems.csv", "Pass in the filename of the csv file.")
+	file := flag.String("filename", "problems.csv", "Pass in the filename of the csv file.")
+	// quizTime := flag.Int("time", 30, "This represents how much time a user will have to complete the quiz.")
 	var rightAnswers int
 	var wrongAnswers int
 	var total int
@@ -42,6 +44,7 @@ func main() {
 	// This reads in inputs from the STDIN device to the NewReader memory
 	reader := bufio.NewReader(os.Stdin)
 
+	start := time.Now()
 	for _, record := range records {
 		fmt.Printf("What is %s?\n", record[0])
 		text, _ := reader.ReadString('\n')
@@ -54,6 +57,8 @@ func main() {
 		}
 		total++
 	}
+	end := time.Now()
+	elapsed := end.Sub(start)
 
-	fmt.Printf("\n --------- \n\nRight: %d\nWrong: %d\nTotal: %d\n", rightAnswers, wrongAnswers, total)
+	fmt.Printf("\n --------- \n\nRight: %d\nWrong: %d\nTotal: %d\nTime: %v", rightAnswers, wrongAnswers, total, elapsed)
 }
