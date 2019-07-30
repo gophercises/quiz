@@ -12,17 +12,16 @@ import (
 	"time"
 )
 
-func main() {
-	// Grab the problems file from the cli
-	file := flag.String("filename", "problems.csv", "Pass in the filename of the csv file.")
-	// quizTime := flag.Int("time", 30, "This represents how much time a user will have to complete the quiz.")
-	var rightAnswers int
-	var wrongAnswers int
-	var total int
-	flag.Parse()
+var (
+	rightAnswers int
+	wrongAnswers int
+	unanswered   int
+	total        int
+)
 
+func getQuestions(file string) [][]string {
 	// Open the csv file
-	inputBytes, err := ioutil.ReadFile(*file)
+	inputBytes, err := ioutil.ReadFile(file)
 	if err != nil {
 		fmt.Print(err)
 	}
@@ -41,10 +40,22 @@ func main() {
 		log.Fatal(err)
 	}
 
+	return records
+}
+
+func finalScore(rightAnswers int, wrongAnswers int, unanswered int, total int) {
+	if unanswered != 0 {
+		wrongAnswers = wrongAnswers + unanswered
+	}
+	fmt.Printf("\n --------- \n\nRight: %d\nWrong: %d\nTotal: %d\n", rightAnswers, wrongAnswers, total)
+}
+
+func askQuestions(records [][]string) {
 	// This reads in inputs from the STDIN device to the NewReader memory
 	reader := bufio.NewReader(os.Stdin)
+	total = len(records)
+	unanswered = total
 
-	start := time.Now()
 	for _, record := range records {
 		fmt.Printf("What is %s?\n", record[0])
 		text, _ := reader.ReadString('\n')
@@ -55,10 +66,28 @@ func main() {
 			wrongAnswers++
 			fmt.Printf("Input: %sAnswer: %s\n", text, record[1])
 		}
-		total++
+		unanswered--
 	}
-	end := time.Now()
-	elapsed := end.Sub(start)
 
-	fmt.Printf("\n --------- \n\nRight: %d\nWrong: %d\nTotal: %d\nTime: %v", rightAnswers, wrongAnswers, total, elapsed)
+	finalScore(rightAnswers, wrongAnswers, unanswered, total)
+}
+
+func newTimer(seconds int) {
+	limit := time.Second * time.Duration(seconds)
+	timer := time.NewTimer(limit)
+	go func() {
+		<-timer.C
+		finalScore(rightAnswers, wrongAnswers, unanswered, total)
+		os.Exit(0)
+	}()
+}
+
+func main() {
+	file := flag.String("filename", "problems.csv", "Pass in the filename of the csv file.")
+	seconds := flag.Int("time", 30, "This represents how much time a user will have to complete the quiz.")
+	flag.Parse()
+
+	questions := getQuestions(*file)
+	newTimer(*seconds)
+	askQuestions(questions)
 }
