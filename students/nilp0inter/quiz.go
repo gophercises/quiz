@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"strings"
 	"time"
 )
 
@@ -41,7 +42,7 @@ func main() {
 			fmt.Println(q)
 			var u string
 			fmt.Scanf("%s", &u)
-			answers <- u == a
+			answers <- strings.ToLower(strings.Trim(u, " ")) == a
 		}
 	}()
 
