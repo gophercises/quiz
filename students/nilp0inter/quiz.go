@@ -11,7 +11,7 @@ import (
 )
 
 var csvfile = flag.String("-csvfile", "problems.csv", "File with questions and answers")
-var quiztime = flag.Int("-quiztime", 10, "Total time for answering the quiz, in seconds")
+var quiztime = flag.Int("-quiztime", 30, "Total time for answering the quiz, in seconds")
 var shuffle = flag.Bool("s", false, "Randomize question order")
 
 func main() {
@@ -35,6 +35,10 @@ func main() {
 		rand.Seed(time.Now().UnixNano())
 		rand.Shuffle(len(entries), func(i, j int) { entries[i], entries[j] = entries[j], entries[i] })
 	}
+
+	fmt.Println("Press any key to start quiz...")
+	var input string
+	fmt.Scanln(&input)
 
 	timeout := make(chan bool, 1)
 	go func() {
