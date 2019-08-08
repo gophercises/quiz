@@ -4,13 +4,15 @@ import (
 	"encoding/csv"
 	"flag"
 	"fmt"
+	"math/rand"
 	"os"
 	"strings"
 	"time"
 )
 
-var csvfile = flag.String("csvfile", "problems.csv", "File with questions and answers")
-var quiztime = flag.Int("quiztime", 10, "Total time for answering the quiz (in seconds)")
+var csvfile = flag.String("-csvfile", "problems.csv", "File with questions and answers")
+var quiztime = flag.Int("-quiztime", 10, "Total time for answering the quiz, in seconds")
+var shuffle = flag.Bool("s", false, "Randomize question order")
 
 func main() {
 	flag.Parse()
@@ -27,6 +29,11 @@ func main() {
 	if err != nil {
 		fmt.Println("Malformed csv file.")
 		os.Exit(1)
+	}
+
+	if *shuffle {
+		rand.Seed(time.Now().UnixNano())
+		rand.Shuffle(len(entries), func(i, j int) { entries[i], entries[j] = entries[j], entries[i] })
 	}
 
 	timeout := make(chan bool, 1)
