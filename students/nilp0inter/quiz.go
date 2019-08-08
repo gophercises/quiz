@@ -5,9 +5,11 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"time"
 )
 
-var csvfile = flag.String("csvfile", "problems.csv", "")
+var csvfile = flag.String("csvfile", "problems.csv", "File with questions and answers")
+var quiztime = flag.Int("quiztime", 10, "Total time for answering the quiz (in seconds)")
 
 func main() {
 	flag.Parse()
@@ -26,15 +28,36 @@ func main() {
 		os.Exit(1)
 	}
 
+	timeout := make(chan bool, 1)
+	go func() {
+		time.Sleep(10 * time.Second)
+		timeout <- true
+	}()
+
+	answers := make(chan bool, 1)
+	go func() {
+		for _, e := range entries {
+			q, a := e[0], e[1]
+			fmt.Println(q)
+			var u string
+			fmt.Scanf("%s", &u)
+			answers <- u == a
+		}
+	}()
+
 	var correct int
-	for _, e := range entries {
-		q, a := e[0], e[1]
-		fmt.Println(q)
-		var u string
-		fmt.Scanf("%s", &u)
-		if u == a {
-			correct++
+	var answered int
+	var timedOut bool
+	for answered < len(entries) && !timedOut {
+		select {
+		case <-timeout:
+			timedOut = true
+		case isCorrect := <-answers:
+			answered++
+			if isCorrect {
+				correct++
+			}
 		}
 	}
-	fmt.Printf("Correct answers: %d/%d\n", correct, len(entries))
+	fmt.Printf("\nCorrect answers: %d/%d\n", correct, len(entries))
 }
