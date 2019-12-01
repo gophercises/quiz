@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"encoding/csv"
 	"fmt"
 	"io"
@@ -20,9 +21,20 @@ func main() {
 	}
 
 	statements := readCSV(file)
+	scanner := bufio.NewScanner(os.Stdin)
 
-	for _, v := range statements {
-		fmt.Println(v)
+	done := make(chan bool)
+	go func() {
+		for i, v := range statements {
+			fmt.Printf("#%d: %s = ", i+1, v.q)
+			_ = scanner.Text()
+			fmt.Println()
+		}
+		done <- true
+	}()
+
+	select {
+	case <-done:
 	}
 }
 
