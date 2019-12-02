@@ -24,7 +24,7 @@ func main() {
 		panic(err.Error())
 	}
 
-	statements := readCSV(file)
+	statements, total := readCSV(file)
 	scanner := bufio.NewScanner(os.Stdin)
 
 	done := make(chan bool)
@@ -48,7 +48,7 @@ func main() {
 	case <-ticker.C:
 		fmt.Println("Time is up buddy!")
 	}
-	fmt.Printf("Scored %d out to 12", score)
+	fmt.Printf("Scored %d out to %d", score, total)
 }
 
 // open the file, returning the interface
@@ -56,17 +56,13 @@ func openFile(fileName string) (io.Reader, error) {
 	return os.Open(fileName)
 }
 
-func readCSV(r io.Reader) []statement {
+func readCSV(r io.Reader) ([]statement, int) {
 	recs, err := csv.NewReader(r).ReadAll()
 
 	if err != nil {
 		log.Println("cannot read reader, do'h")
 		panic(err.Error())
 	}
-
-	total := len(recs)
-
-	log.Printf("total: %d", total)
 
 	var ss []statement
 	for _, v := range recs {
@@ -76,7 +72,7 @@ func readCSV(r io.Reader) []statement {
 		ss = append(ss, s)
 	}
 
-	return ss
+	return ss, len(recs)
 }
 
 type statement struct {
