@@ -14,7 +14,7 @@ import (
 var (
 	// set flags
 	csvPath = flag.String("csv", "problems.csv", "a csv file in the format of 'question,answer'")
-	limit   = flag.Int("limit", 30, "the time limit for the quiz in seconds'")
+	limit   = flag.Int("limit", 3, "the time limit for the quiz in seconds'")
 )
 
 func main() {
