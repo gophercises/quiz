@@ -52,7 +52,7 @@ Al final de la prueba, el programa aún debe generar el número total de pregunt
 
 ## Bonus
 
-As a bonus exercises you can also...
+Un bonus si adicionalmente haces:
 
 1. Agregue recortes y limpieza de cadenas para ayudar a garantizar que las respuestas correctas con espacios en blanco adicionales, mayúsculas, etc. no se consideren incorrectas. * Sugerencia: consulte el paquete de cadenas. (https://golang.org/pkg/strings/) *
 2. Agregue una opción (una nueva bandera) para barajar el orden del cuestionario cada vez que se ejecute.
