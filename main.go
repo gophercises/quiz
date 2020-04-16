@@ -3,13 +3,15 @@ package main
 import (
 	"fmt"
 
+	"github.com/fenriz07/quiz/cli"
 	repositorycsv "github.com/fenriz07/quiz/repositories"
 )
 
 func main() {
-	fmt.Println("Probando")
+	fmt.Println("Test")
 
-	records := repositorycsv.ReadFile("problems.csv")
+	csv := repositorycsv.ReadFile("problems.csv")
 
-	fmt.Println(records)
+	cli.Show(csv)
+
 }
