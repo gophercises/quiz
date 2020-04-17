@@ -16,8 +16,6 @@ func main() {
 	nameFile := flag.String("namefile", "problems.csv", "name to file evaluate")
 	limitTime := flag.Int("limittime", 30, "time limit for quiz")
 
-	flag.Parse()
-
 	welcome(*limitTime)
 
 	csv := repositorycsv.ReadFile(*nameFile)

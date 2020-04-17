@@ -2,8 +2,11 @@ package repositorycsv
 
 import (
 	"encoding/csv"
+	"flag"
 	"io"
+	"math/rand"
 	"os"
+	"time"
 )
 
 type Row struct {
@@ -25,6 +28,25 @@ func (r Row) GetQuestion() string {
 
 func (r Row) GetAnswer() string {
 	return r.answer
+}
+
+func (c *Csv) Shuffle() {
+
+	randCsv := flag.Bool("randcsv", false, "is rand quiz")
+
+	flag.Parse()
+
+	if *randCsv {
+		rand.Seed(time.Now().UnixNano())
+
+		for i := 1; i < len(c.records); i++ {
+			r := rand.Intn(i + 1)
+			if i != r {
+				c.records[r], c.records[i] = c.records[i], c.records[r]
+			}
+		}
+	}
+
 }
 
 func ReadFile(namefile string) Csv {
@@ -65,6 +87,8 @@ func ReadFile(namefile string) Csv {
 		//records = append(records, record)
 
 	}
+
+	csv.Shuffle()
 
 	return csv
 
