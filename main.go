@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 
 	"github.com/fenriz07/quiz/cli"
@@ -10,7 +11,10 @@ import (
 func main() {
 	fmt.Println("Test")
 
-	csv := repositorycsv.ReadFile("problems.csv")
+	nameFile := flag.String("namefile", "problems.csv", "name to file evaluate")
+	flag.Parse()
+
+	csv := repositorycsv.ReadFile(*nameFile)
 
 	cli.Show(csv)
 
