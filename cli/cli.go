@@ -5,25 +5,35 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"time"
 
 	repositorycsv "github.com/fenriz07/quiz/repositories"
 )
 
-func Show(csv repositorycsv.Csv) {
+func Show(csv repositorycsv.Csv, limittime int) {
 
-	resultUser := make(chan []string)
+	resultUser := make(chan bool)
 
-	go ask(csv, resultUser)
+	timeoutCh := time.After(time.Duration(limittime) * time.Second)
 
-	calcResult(csv, resultUser)
+	answers := []string{}
+
+	go ask(csv, resultUser, &answers)
+
+	select {
+	case <-resultUser:
+		fmt.Println("Gracias por terminar el test su resultado sera mostrado")
+	case <-timeoutCh:
+		fmt.Println("se acabo el tiempo su resultado sera mostrado")
+	}
+
+	calcResult(csv, answers)
 
 }
 
-func ask(csv repositorycsv.Csv, c chan<- []string) {
+func ask(csv repositorycsv.Csv, c chan<- bool, answers *[]string) {
 
 	reader := bufio.NewReader(os.Stdin)
-
-	answers := []string{}
 
 	for _, row := range csv.GetRecords() {
 
@@ -37,23 +47,28 @@ func ask(csv repositorycsv.Csv, c chan<- []string) {
 
 		answer = strings.Replace(answer, "\n", "", -1)
 
-		answers = append(answers, answer)
+		*answers = append(*answers, answer)
 
 	}
 
-	c <- answers
+	c <- true
 }
 
-func calcResult(csv repositorycsv.Csv, c <-chan []string) {
+func calcResult(csv repositorycsv.Csv, answers []string) {
 	var total int
 	var corrects int
 	var incorrects int
 
-	answers := <-c
+	lenanswers := len(answers)
 
 	for k, row := range csv.GetRecords() {
-		if answers[k] == row.GetAnswer() {
-			corrects++
+
+		if k < lenanswers {
+			if answers[k] == row.GetAnswer() {
+				corrects++
+			} else {
+				incorrects++
+			}
 		} else {
 			incorrects++
 		}
