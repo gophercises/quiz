@@ -55,7 +55,7 @@ func printStats() {
 
 func printInstructions() {
 	fmt.Printf("%s\n", strings.Repeat("=", 50))
-	fmt.Printf("# Welcome to the quiz game, press a key to start #\n")
+	fmt.Printf("# Welcome to the quiz game, press enter to start #\n")
 	fmt.Printf("#                                                #\n")
 	fmt.Printf("#     You have %d seconds to finish the game     #\n", *timeout)
 	fmt.Printf("%s\n\n", strings.Repeat("=", 50))
