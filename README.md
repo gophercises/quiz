@@ -1,12 +1,6 @@
-# Exercise #1: Quiz Game
+# Exercise #1: Quiz Game v2.0
 
 [![exercise status: released](https://img.shields.io/badge/exercise%20status-released-green.svg?style=for-the-badge)](https://gophercises.com/exercises/quiz)
-
-## Exercise details
-
-This exercise is broken into two parts to help simplify the process of explaining it as well as to make it easier to solve. The second part is harder than the first, so if you get stuck feel free to move on to another problem then come back to part 2 later.
-
-*Note: I didn't break this into multiple exercises like I do for some exercises because both of these combined should only take ~30m to cover in screencasts.*
 
 ### Part 1
 
@@ -48,9 +42,6 @@ Users should be asked to press enter (or some other key) before the timer starts
 
 At the end of the quiz the program should still output the total number of questions correct and how many questions there were in total. Questions given invalid answers or unanswered are considered incorrect.
 
-## Bonus
+### Part 3
 
-As a bonus exercises you can also...
-
-1. Add string trimming and cleanup to help ensure that correct answers with extra whitespace, capitalization, etc are not considered incorrect. *Hint: Check out the [strings](https://golang.org/pkg/strings/) package.*
-2. Add an option (a new flag) to shuffle the quiz order each time it is run.
+Now fetching the questions from the mongoDB 
