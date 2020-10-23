@@ -54,15 +54,7 @@ func main() {
 	}
 	defer f.Close()
 
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	records := csv.NewReader(f)
-
-	if err != nil {
-		log.Fatal(err)
-	}
 
 	card.Correct = 0
 	card.Total = 0
@@ -74,9 +66,6 @@ func main() {
 			break
 		}
 
-		if err != nil {
-			panic(err)
-		}
 		card.Total++
 		duration := time.Duration(
 			int64(timeLimit) * int64(time.Second),
