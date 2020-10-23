@@ -8,7 +8,6 @@ import (
 	"io"
 	"log"
 	"os"
-	"strconv"
 	"time"
 	"unicode/utf8"
 )
@@ -29,7 +28,7 @@ func trimLastChar(s string) string {
 	return s[:len(s)-size]
 }
 
-func initializeQuiz() (string, int) {
+func initializeQuize() (string, int) {
 	filePath := flag.String("csv-file", "problems.csv", "A scv file in the format 'question,answer'")
 	timeLimit := flag.Int("time-limit", 30, "A time limit per question in seconds")
 
@@ -47,7 +46,7 @@ func initializeQuiz() (string, int) {
 
 func main() {
 
-	filePath, timeLimit := initializeQuiz()
+	filePath, timeLimit := initializeQuize()
 
 	f, err := os.Open(filePath)
 	if err != nil {
@@ -55,7 +54,15 @@ func main() {
 	}
 	defer f.Close()
 
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	records := csv.NewReader(f)
+
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	card.Correct = 0
 	card.Total = 0
@@ -65,6 +72,10 @@ func main() {
 		// Stop at EOF.
 		if err == io.EOF {
 			break
+		}
+
+		if err != nil {
+			panic(err)
 		}
 		card.Total++
 		duration := time.Duration(
@@ -90,15 +101,7 @@ func main() {
 			fmt.Printf("Correct Answer: %v \n", record[1])
 		}
 
-		a, err := strconv.Atoi(trimLastChar(answer))
-		if err != nil {
-			fmt.Println("Numbers only please.")
-		}
-		correct, err := strconv.Atoi(record[1])
-		if err != nil {
-			return
-		}
-		if a == correct {
+		if trimLastChar(answer) == record[1] {
 			fmt.Println("Correct!")
 			card.Correct++
 		} else {
