@@ -29,7 +29,7 @@ func trimLastChar(s string) string {
 	return s[:len(s)-size]
 }
 
-func initializeQuize() (string, int) {
+func initializeQuiz() (string, int) {
 	filePath := flag.String("csv-file", "problems.csv", "A scv file in the format 'question,answer'")
 	timeLimit := flag.Int("time-limit", 30, "A time limit per question in seconds")
 
