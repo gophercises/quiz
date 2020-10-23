@@ -19,6 +19,8 @@ type Scorecard struct {
 	Correct int
 }
 
+var card Scorecard
+
 func trimLastChar(s string) string {
 	r, size := utf8.DecodeLastRuneInString(s)
 	if r == utf8.RuneError && (size == 0 || size == 1) {
@@ -27,8 +29,7 @@ func trimLastChar(s string) string {
 	return s[:len(s)-size]
 }
 
-func main() {
-
+func initializeQuize() (string, int) {
 	filePath := flag.String("csv-file", "problems.csv", "A scv file in the format 'question,answer'")
 	timeLimit := flag.Int("time-limit", 30, "A time limit per question in seconds")
 
@@ -41,10 +42,16 @@ func main() {
 		fmt.Printf("Time Limit: %v seconds (per question)\n", *timeLimit)
 		fmt.Println("--------------------------------")
 	}
+	return *filePath, *timeLimit
+}
 
-	f, err := os.Open(*filePath)
+func main() {
+
+	filePath, timeLimit := initializeQuize()
+
+	f, err := os.Open(filePath)
 	if err != nil {
-		log.Fatal("Unable to read input file "+*filePath, err)
+		log.Fatal("Unable to read input file "+filePath, err)
 	}
 	defer f.Close()
 
@@ -58,7 +65,6 @@ func main() {
 		log.Fatal(err)
 	}
 
-	var card Scorecard
 	card.Correct = 0
 	card.Total = 0
 
@@ -74,11 +80,11 @@ func main() {
 		}
 		card.Total++
 		duration := time.Duration(
-			int64(*timeLimit) * int64(time.Second),
+			int64(timeLimit) * int64(time.Second),
 		)
 		timer := time.NewTimer(duration)
 
-		if *timeLimit > 0 {
+		if timeLimit > 0 {
 			go func() {
 				<-timer.C
 				fmt.Printf("Times up. You got %v out of %v correct", card.Correct, card.Total)
