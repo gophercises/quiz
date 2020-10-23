@@ -74,10 +74,6 @@ func main() {
 		if err == io.EOF {
 			break
 		}
-
-		if err != nil {
-			panic(err)
-		}
 		card.Total++
 		duration := time.Duration(
 			int64(timeLimit) * int64(time.Second),
