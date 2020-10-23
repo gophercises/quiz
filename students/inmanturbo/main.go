@@ -55,15 +55,7 @@ func main() {
 	}
 	defer f.Close()
 
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	records := csv.NewReader(f)
-
-	if err != nil {
-		log.Fatal(err)
-	}
 
 	card.Correct = 0
 	card.Total = 0
@@ -104,7 +96,7 @@ func main() {
 		}
 		correct, err := strconv.Atoi(record[1])
 		if err != nil {
-			log.Fatal(err)
+			return
 		}
 		if a == correct {
 			fmt.Println("Correct!")
