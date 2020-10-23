@@ -47,7 +47,7 @@ func initializeQuiz() (string, int) {
 
 func main() {
 
-	filePath, timeLimit := initializeQuize()
+	filePath, timeLimit := initializeQuiz()
 
 	f, err := os.Open(filePath)
 	if err != nil {
