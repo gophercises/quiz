@@ -10,6 +10,7 @@ import (
 	"log"
 	"os"
 	"strings"
+	"time"
 )
 
 // Question describes a single question from the quiz
@@ -47,19 +48,32 @@ func (r Results) score() int {
 
 func main() {
 	fileName := flag.String("file", "problems.csv", "the CSV filename")
+	timer := flag.Int("timer", 30, "the amount of time expected for the quiz")
 	flag.Parse()
-	// Read CSV file
-	quiz, err := readCSV(*fileName)
-	if err != nil {
-		log.Fatal(err)
-		return
+
+	// Ask for confirmation before starting the quiz
+	shouldStartQuiz()
+
+	qChan := make(chan *Results, 1)
+	go func() {
+		// Read CSV file
+		quiz, err := readCSV(*fileName)
+		if err != nil {
+			log.Fatal(err)
+			return
+		}
+
+		// Read user input
+		qChan <- doQuiz(quiz)
+	}()
+
+	select {
+	case results := <-qChan:
+		// Print results
+		fmt.Printf("Total Good: %d\nTotal Questions: %d\n", results.score(), len(results.submissions))
+	case <-time.After(time.Duration(*timer) * time.Second):
+		fmt.Println("Quiz time is over!")
 	}
-
-	// Read user input
-	results := doQuiz(quiz)
-
-	// Print results
-	fmt.Printf("Total Good: %d\nTotal Questions: %d\n", results.score(), len(results.submissions))
 }
 
 func readCSV(fileName string) (*Quiz, error) {
@@ -83,6 +97,22 @@ func readCSV(fileName string) (*Quiz, error) {
 	}
 
 	return &quiz, nil
+}
+
+func shouldStartQuiz() {
+	scanner := bufio.NewScanner(os.Stdin)
+	for {
+		fmt.Println("Do you want to start the quiz? [Y]...")
+		scanner.Scan()
+		if scanner.Err() != nil {
+			log.Fatal("error reading confirmation")
+			continue
+		}
+
+		if strings.TrimSpace(scanner.Text()) == "Y" {
+			break
+		}
+	}
 }
 
 func doQuiz(quiz *Quiz) *Results {
