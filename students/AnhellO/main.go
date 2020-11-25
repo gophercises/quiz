@@ -54,26 +54,39 @@ func main() {
 	// Ask for confirmation before starting the quiz
 	shouldStartQuiz()
 
-	qChan := make(chan *Results, 1)
-	go func() {
-		// Read CSV file
-		quiz, err := readCSV(*fileName)
-		if err != nil {
-			log.Fatal(err)
-			return
-		}
+	results := Results{}
+	inputChan := make(chan Input)
 
-		// Read user input
-		qChan <- doQuiz(quiz)
-	}()
-
-	select {
-	case results := <-qChan:
-		// Print results
-		fmt.Printf("Total Good: %d\nTotal Questions: %d\n", results.score(), len(results.submissions))
-	case <-time.After(time.Duration(*timer) * time.Second):
-		fmt.Println("Quiz time is over!")
+	// Read CSV file
+	quiz, err := readCSV(*fileName)
+	if err != nil {
+		log.Fatal(err)
+		return
 	}
+
+	// Read user input
+OuterLoop:
+	for i, question := range quiz.questions {
+		go func() {
+			input := doQuiz(i, question)
+			inputChan <- input
+		}()
+		select {
+		case input := <-inputChan:
+			results.submissions = append(results.submissions, input)
+		case <-time.After(time.Duration(*timer) * time.Second):
+			fmt.Println("Quiz time is over!")
+			break OuterLoop
+		}
+	}
+
+	// Print results
+	fmt.Printf(
+		"Total Good: %d\nTotal Questions Answered: %d\nTotal Questions on Quiz: %d\n",
+		results.score(),
+		len(results.submissions),
+		len(quiz.questions),
+	)
 }
 
 func readCSV(fileName string) (*Quiz, error) {
@@ -102,7 +115,7 @@ func readCSV(fileName string) (*Quiz, error) {
 func shouldStartQuiz() {
 	scanner := bufio.NewScanner(os.Stdin)
 	for {
-		fmt.Println("Do you want to start the quiz? [Y]...")
+		fmt.Println("Do you want to start the quiz? [Y/n for exiting]...")
 		scanner.Scan()
 		if scanner.Err() != nil {
 			log.Fatal("error reading confirmation")
@@ -110,29 +123,29 @@ func shouldStartQuiz() {
 		}
 
 		if strings.TrimSpace(scanner.Text()) == "Y" {
+			fmt.Println("##### WELCOME TO THE QUIZ! #####")
 			break
+		}
+
+		if strings.TrimSpace(scanner.Text()) == "n" {
+			os.Exit(0)
 		}
 	}
 }
 
-func doQuiz(quiz *Quiz) *Results {
+func doQuiz(i int, question Question) Input {
+	// Read question i
 	scanner := bufio.NewScanner(os.Stdin)
-	score := Results{}
-	fmt.Println("##### WELCOME TO THE QUIZ! #####")
-
-	for i, question := range quiz.questions {
-		// Read question i
-		input := Input{response: "", good: false}
-		fmt.Printf("Question %d: %s?\n", i, question.description)
-		scanner.Scan()
-		if scanner.Err() != nil {
-			log.Fatalf("error reading question #%d", i)
-			continue
-		}
-		input.response = strings.TrimSpace(scanner.Text())
-		input.good = input.response == question.answer
-		score.submissions = append(score.submissions, input)
+	input := Input{}
+	fmt.Printf("Question %d: %s?\n", i, question.description)
+	scanner.Scan()
+	if scanner.Err() != nil {
+		log.Fatalf("error reading question #%d", i)
+		return input
 	}
 
-	return &score
+	input.response = strings.TrimSpace(scanner.Text())
+	input.good = input.response == question.answer
+
+	return input
 }
