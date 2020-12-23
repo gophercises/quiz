@@ -53,6 +53,7 @@ func main() {
 
 	// Ask for confirmation before starting the quiz
 	shouldStartQuiz()
+	fmt.Printf("You have %d seconds to finalize the quiz!\n", *timer)
 
 	results := Results{}
 	inputChan := make(chan Input)
@@ -106,7 +107,10 @@ func readCSV(fileName string) (*Quiz, error) {
 			log.Fatalf("error reading CSV row: %s\n", err)
 		}
 
-		quiz.questions = append(quiz.questions, Question{description: record[0], answer: record[1]})
+		quiz.questions = append(quiz.questions, Question{
+			description: strings.ToLower(normalizeSpaces(record[0])),
+			answer:      strings.ToLower(normalizeSpaces(record[1])),
+		})
 	}
 
 	return &quiz, nil
@@ -148,4 +152,8 @@ func doQuiz(i int, question Question) Input {
 	input.good = input.response == question.answer
 
 	return input
+}
+
+func normalizeSpaces(s string) string {
+	return strings.Join(strings.Fields(strings.TrimSpace(s)), " ")
 }
