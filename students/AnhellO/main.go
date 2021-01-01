@@ -108,8 +108,8 @@ func readCSV(fileName string) (*Quiz, error) {
 		}
 
 		quiz.questions = append(quiz.questions, Question{
-			description: strings.ToLower(normalizeSpaces(record[0])),
-			answer:      strings.ToLower(normalizeSpaces(record[1])),
+			description: normalizeSpaces(record[0]),
+			answer:      normalizeSpaces(record[1]),
 		})
 	}
 
@@ -141,15 +141,15 @@ func doQuiz(i int, question Question) Input {
 	// Read question i
 	scanner := bufio.NewScanner(os.Stdin)
 	input := Input{}
-	fmt.Printf("Question %d: %s?\n", i, question.description)
+	fmt.Printf("Question %d: %s?\n", i+1, question.description)
 	scanner.Scan()
 	if scanner.Err() != nil {
 		log.Fatalf("error reading question #%d", i)
 		return input
 	}
 
-	input.response = strings.TrimSpace(scanner.Text())
-	input.good = input.response == question.answer
+	input.response = normalizeSpaces(scanner.Text())
+	input.good = strings.EqualFold(input.response, question.answer)
 
 	return input
 }
