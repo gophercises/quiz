@@ -8,6 +8,7 @@ import (
 	"io"
 	"io/ioutil"
 	"log"
+	"math/rand"
 	"os"
 	"strings"
 	"time"
@@ -112,6 +113,15 @@ func readCSV(fileName string) (*Quiz, error) {
 			answer:      normalizeSpaces(record[1]),
 		})
 	}
+
+	// Randomize quiz questions
+	rand.Seed(time.Now().UnixNano())
+	rand.Shuffle(
+		len(quiz.questions),
+		func(i, j int) {
+			quiz.questions[i], quiz.questions[j] = quiz.questions[j], quiz.questions[i]
+		},
+	)
 
 	return &quiz, nil
 }
