@@ -50,6 +50,7 @@ func (r Results) score() int {
 func main() {
 	fileName := flag.String("file", "problems.csv", "the CSV filename")
 	timer := flag.Int("timer", 30, "the amount of time expected for the quiz")
+	shuffle := flag.Bool("shuffle", false, "enable to randomize the quiz order each time it is run")
 	flag.Parse()
 
 	// Ask for confirmation before starting the quiz
@@ -60,7 +61,7 @@ func main() {
 	inputChan := make(chan Input)
 
 	// Read CSV file
-	quiz, err := readCSV(*fileName)
+	quiz, err := readCSV(*fileName, *shuffle)
 	if err != nil {
 		log.Fatal(err)
 		return
@@ -91,7 +92,7 @@ OuterLoop:
 	)
 }
 
-func readCSV(fileName string) (*Quiz, error) {
+func readCSV(fileName string, shuffle bool) (*Quiz, error) {
 	data, err := ioutil.ReadFile(fileName)
 	if err != nil {
 		return nil, fmt.Errorf("error reading csv file: %s", err)
@@ -114,14 +115,16 @@ func readCSV(fileName string) (*Quiz, error) {
 		})
 	}
 
-	// Randomize quiz questions
-	rand.Seed(time.Now().UnixNano())
-	rand.Shuffle(
-		len(quiz.questions),
-		func(i, j int) {
-			quiz.questions[i], quiz.questions[j] = quiz.questions[j], quiz.questions[i]
-		},
-	)
+	if shuffle {
+		// Randomize quiz questions
+		rand.Seed(time.Now().UnixNano())
+		rand.Shuffle(
+			len(quiz.questions),
+			func(i, j int) {
+				quiz.questions[i], quiz.questions[j] = quiz.questions[j], quiz.questions[i]
+			},
+		)
+	}
 
 	return &quiz, nil
 }
