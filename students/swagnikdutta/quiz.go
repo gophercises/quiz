@@ -18,7 +18,7 @@ func main() {
 	file, err := os.Open(*filepath)
 
 	if err != nil {
-		log.Fatal("Error reading csv\n", err)
+		log.Fatal("Error while reading csv\n", err)
 	}
 
 	reader := csv.NewReader(file)
@@ -26,7 +26,7 @@ func main() {
 	file.Close()
 
 	if err != nil {
-		fmt.Println(err)
+		log.Fatal("There was an error reading records from file\n", err)
 	}
 
 	correct := 0
