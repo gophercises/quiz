@@ -32,9 +32,12 @@ func main() {
 	correct := 0
 	input := bufio.NewScanner(os.Stdin)
 	for idx, record := range records {
-		// Here there's a chance of the timer getting expired before the user entering an answer
-		// there's also a chance of the user answering before the timer expires.
-		// in either case, I need to listen for both sorts of events
+		// Here two things can happen
+		// Either the timer will expire before the user can answer or the user will answer before the timer expires.
+		// In either case, I need to listen for both sorts of events.
+		// So there has to be 2 channels to listen to:
+		//   	First, through which the user's answer will be received.
+		//		Second, through which the timer will notify that the time is up
 		//
 		// There are two concurrent processes involved.
 		// 1. The problem statement has to be shown to the user. We wait for or handle the user's response.
