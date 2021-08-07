@@ -11,7 +11,7 @@ import (
 )
 
 func main() {
-	filepath := flag.String("csv", "../../problems.csv", "a csv file in the format of 'question,answer' (default \"problems.csv\")")
+	filepath := flag.String("csv", "problems.csv", "a csv file in the format of 'question,answer' (default \"problems.csv\")")
 	limit := flag.Int("limit", 30, "the time limit for the quiz in seconds (default 30)")
 	flag.Parse()
 
