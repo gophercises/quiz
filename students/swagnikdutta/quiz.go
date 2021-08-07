@@ -47,10 +47,10 @@ func main() {
 		go func() {
 			fmt.Printf("Problem #%d: %s = ", idx+1, record[0])
 			input.Scan()
-			answer := input.Text()
+			userAnswer := input.Text()
 			// Answer provided by the user has to be sent to the main goroutine (from this goroutine) via a channel.
 			// So we need to have a channel created in the first place - answerChannel (created above)
-			answerChannel <- answer
+			answerChannel <- userAnswer
 		}()
 
 		// Step 2: starting the timer
@@ -60,7 +60,7 @@ func main() {
 		select {
 		case <-timer.C:
 			// When the timer expires, the current time is sent to channel C
-			fmt.Printf("You scored %d out of %d.\n", correct, len(records))
+			fmt.Printf("\nYou scored %d out of %d.\n", correct, len(records))
 			return
 		case userAnswer := <-answerChannel:
 			if userAnswer == record[1] {
@@ -68,5 +68,5 @@ func main() {
 			}
 		}
 	}
-	fmt.Printf("You scored %d out of %d.\n", correct, len(records))
+	fmt.Printf("\nYou scored %d out of %d.\n", correct, len(records))
 }
