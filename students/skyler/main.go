@@ -1,43 +1,78 @@
 package main
 
 import (
+	"bufio"
 	"encoding/csv"
 	"fmt"
-	"io"
+	"log"
 	"os"
+
+	"github.com/fatih/color"
 )
 
+type Problem struct {
+	Prompt string
+	Answer string
+}
+
 func main() {
-	csvReaderRow()
+	//getproblems
+	f, err := os.Open("problems.csv")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer f.Close()
+
+	csvReader := csv.NewReader(f)
+	data, err := csvReader.ReadAll()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	problemList := createProblemList(data)
+
+	total := 0
+
+	scanner := bufio.NewScanner(os.Stdin)
+	fmt.Println("please answer the prompted questions and then press Enter: ")
+	for _, v := range problemList {
+		fmt.Println(v.Prompt)
+
+		//compare func
+		scanner.Scan()
+		ans1 := scanner.Text()
+		if err != nil {
+			fmt.Println("error converting string")
+		}
+
+		if ans1 == v.Answer {
+			color.Green("correct")
+			total++
+		} else {
+			color.Red("incorrect")
+		}
+	}
+
+	fmt.Printf("you answered %d correct of 12. ", total)
 
 }
 
-func csvReaderRow() {
-	recordFile, err := os.Open("problems.csv")
-	if err != nil {
-		fmt.Println("an error has encoutered opening file", err)
-		return
-	}
-
-	reader := csv.NewReader(recordFile)
-
-	header, err := reader.Read()
-	if err != nil {
-		fmt.Println("an error encountered reading file", err)
-		return
-	}
-	fmt.Printf("Headers : %v  \n", header)
-
-	for i := 0; ; i = i + 1 {
-		record, err := reader.Read()
-		if err == io.EOF {
-			break
-		} else if err != nil {
-			fmt.Println("an error encountered recording answer", err)
-			return
+func createProblemList(data [][]string) []Problem {
+	var problemList []Problem
+	for i, line := range data {
+		if i > 0 {
+			var rec Problem
+			for j, field := range line {
+				if j == 0 {
+					rec.Prompt = field
+				} else if j == 1 {
+					rec.Answer = field
+				}
+			}
+			problemList = append(problemList, rec)
 		}
 
-		fmt.Printf("Row %d : %v \n", i, record)
 	}
-
+	return problemList
 }
