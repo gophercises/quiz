@@ -3,9 +3,11 @@ package main
 import (
 	"bufio"
 	"encoding/csv"
+	"flag"
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	"github.com/fatih/color"
 )
@@ -16,6 +18,10 @@ type Problem struct {
 }
 
 func main() {
+
+	timelimit := flag.Int("limit", 30, "the time limit for the quiz in seconds")
+	flag.Parse()
+
 	//getproblems
 	f, err := os.Open("problems.csv")
 	if err != nil {
@@ -32,31 +38,52 @@ func main() {
 
 	problemList := createProblemList(data)
 
-	total := 0
-
 	scanner := bufio.NewScanner(os.Stdin)
-	fmt.Println("please answer the prompted questions and then press Enter: ")
-	for _, v := range problemList {
-		fmt.Println(v.Prompt)
+	fmt.Println("please answer the prompted questions and press Enter to begin : ")
+	scanner.Scan()
+	testStart := scanner.Text()
+	if testStart == "" {
+		fmt.Println("timer started")
 
-		//compare func
-		scanner.Scan()
-		ans1 := scanner.Text()
-		if err != nil {
-			fmt.Println("error converting string")
-		}
-
-		if ans1 == v.Answer {
-			color.Green("correct")
-			total++
-		} else {
-			color.Red("incorrect")
-		}
 	}
 
-	fmt.Printf("you answered %d correct of 12. ", total)
+	timer := time.NewTimer(time.Duration(*timelimit) * time.Second)
+
+	total := 0
+
+	for _, v := range problemList {
+		fmt.Println(v.Prompt)
+		answerCh := make(chan string)
+
+		go func() {
+			scanner.Scan()
+			ans1 := scanner.Text()
+			answerCh <- ans1
+		}()
+
+		select {
+		case <-timer.C:
+			color.HiRed("**TIMES UP***\n")
+			fmt.Printf("you answered %d correct of 12. ", total)
+			return
+		case ans1 := <-answerCh:
+			//compare func
+			if err != nil {
+				fmt.Println("error converting string")
+			}
+			if ans1 == v.Answer {
+				color.Green("correct")
+				total++
+			} else {
+				color.Red("incorrect")
+			}
+		}
+
+	}
 
 }
+
+//func gameTimer()
 
 func createProblemList(data [][]string) []Problem {
 	var problemList []Problem
