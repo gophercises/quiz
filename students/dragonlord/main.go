@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"strings"
+	"time"
 )
 
 type problem struct {
@@ -14,15 +16,12 @@ type problem struct {
 	answer string
 }
 
-var corrects int
-var failed int
-
 func main() {
 	csvFileName := flag.String("csv", "problems.csv", "a csv file in the format of 'question,answer'")
-	timeDuration := flag.Int("duration", 30, "the time limit for the quiz in seconds")
+	timeLimit := flag.Float64("limit", 30, "the time limit for the quiz in seconds")
 	flag.Parse()
 
-	_ = timeDuration
+	_ = timeLimit
 	
 	file, err := os.Open(*csvFileName)
 	defer file.Close()
@@ -36,28 +35,41 @@ func main() {
 		exit(err.Error())
 	}
 	problems := parseLines(lines)
+	var correct int
+	timer := time.NewTimer(time.Duration(*timeLimit) * time.Second)
 
 	for i, problem := range problems {
 		question := problem.question
 		answer, _ := strconv.Atoi(problem.answer)
-		fmt.Printf("Problem %d: %s = ", i+1, question)
-		
-		scanner  := bufio.NewScanner(os.Stdin);
-		scanner.Scan();
-		input , err := strconv.Atoi(scanner.Text());
-		if err != nil {
-			fmt.Println("\nAn error ocurred while trying to pass answer.");
-			return;
-		}
+		answerChan := make(chan int)
 
-		if answer == input {
-			corrects++
-		} else {
-			failed++
+		fmt.Printf("Problem %d: %s = ", i+1, question)
+
+		go func() {
+			scanner  := bufio.NewScanner(os.Stdin);
+			scanner.Scan();
+			input , err := strconv.Atoi(scanner.Text());
+			if err != nil {
+				fmt.Println()
+				return;
+			}
+			answerChan <- input
+		}()
+
+		select {
+		case _, ok:= <-timer.C:
+			if ok {
+				fmt.Printf("\nYou scored %d out of %d.", correct, len(problems))
+				return
+			}
+		case input, ok := <-answerChan:
+			if ok && answer == input {
+				correct++
+			}
 		}
 	}
-	fmt.Println("Correct answers:", corrects)
-	fmt.Println("Incorrect answers:", failed)
+	fmt.Printf("You scored %d out of %d.", correct, len(problems))
+
 }
 
 func parseLines(problems [][]string) []problem {
@@ -65,7 +77,7 @@ func parseLines(problems [][]string) []problem {
 	for i, line := range problems {
 		ret[i] = problem{
 			question: line[0],
-			answer: line[1],
+			answer: strings.TrimSpace(line[1]),
 		}
 	}
 	return ret
