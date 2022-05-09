@@ -46,6 +46,7 @@ def main(file_name, secs, randomize)
       end
     end
   rescue Timeout::Error
+    print "\nYou have run out of time"
   ensure
     print "\n"
     print 'Your score: ', point.get, '/', questions.length, "\n"
@@ -55,6 +56,7 @@ end
 file_name = 'problems.csv'
 file_name = ARGV[0] if ARGV.length >= 1
 
+timer = 30
 begin
   timer = Integer(ARGV[1]) if ARGV.length >= 2
 rescue TypeError
