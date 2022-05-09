@@ -25,9 +25,10 @@ def ask_question_check_answer(question, answer, point)
   point.inc if answer_from_user == answer
 end
 
-def main(file_name, secs)
+def main(file_name, secs, randomize)
   point = Point.new
   questions = CSV.read file_name
+  questions.shuffle! if randomize == true
 
   print "You will have maximum of #{secs} seconds to answer all questions\n"
   print 'Press enter to start...'
@@ -60,4 +61,7 @@ rescue TypeError
   timer = 30
 end
 
-main file_name, timer
+randomize = false
+randomize = true if ARGV.length >= 3 && ARGV[2] == '-r'
+
+main file_name, timer, randomize
