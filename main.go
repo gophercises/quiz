@@ -48,29 +48,30 @@ flag.Parse()
 
 	//This is setup below problems to ensure no lag for the user.
 	timer := time.NewTimer(time.Duration(*timerDuration) * time.Second)
-	
+
 	correct := 0
 
 	//user input section
 	for i, p := range problems{
-		//Select statement to stop the for loo
+		//Select statement to stop the for loop
+		fmt.Printf("Problem #%d:  %s = \n", i+1, p.q)
+		answerCh := make(chan string)
+		go func(){
+			var answer string
+			fmt.Scanf("%s\n", &answer)
+			answerCh <- answer
+		}()
+
+		//no default case in the select statement because now there are two options. 1 - time runs out, 2 - correct answer is received and increments score.
 		select {
 		case <-timer.C:
-			fmt.Printf("You scored %d out of %d.\n", correct, len(problems))
+			fmt.Printf("\nYou scored %d out of %d.\n", correct, len(problems))
 			return
-		default:
-			fmt.Printf("Problem #%d:  %s = \n", i+1, p.q)
-		//Allowing the user to input, scanF isn't always appropriate.scanf good for numbers not for strings. It clears all the whitespace
-		var answer string
-		//reference to answer
-		fmt.Scanf("%s\n", &answer)
+		case answer := <-answerCh:
 		if answer == p.a {
 			correct++
-		} 
+			} 
 		}
-		//Start timer here with an enter input
-		
-		//Could put in an else statement here to do other logic or say that was incorrect etc. Give a running total update
 	}
 	fmt.Printf("You scored %d out of %d.\n", correct, len(problems))
 }
